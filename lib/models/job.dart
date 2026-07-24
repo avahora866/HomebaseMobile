@@ -46,6 +46,12 @@ class Job {
   /// the home-screen list dot (accent once run, divider until then).
   bool hasRun;
 
+  /// Snapshot of [paramValues] taken at the moment this job was last run —
+  /// so the result card reflects what was actually run, not whatever the
+  /// param fields have since been changed to (e.g. switching the media
+  /// type dropdown after a result already came back).
+  Map<String, String?>? lastRunParamValues;
+
   Job({
     required this.id,
     required this.name,
@@ -60,6 +66,7 @@ class Job {
     this.result,
     this.errorMessage,
     this.hasRun = false,
+    this.lastRunParamValues,
   });
 
   bool get hasParams => params.isNotEmpty;

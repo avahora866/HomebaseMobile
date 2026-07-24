@@ -110,7 +110,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     if (job.id == 'random_media' && job.result is Map) {
       final result = job.result as Map<String, dynamic>;
       if (result['media'] == null) return const EmptyResultCard();
-      final mediaType = job.paramValues['media'];
+      final mediaType = job.lastRunParamValues?['media'];
       return MediaResultCard(result: result, category: mediaType ?? job.category.label);
     }
 

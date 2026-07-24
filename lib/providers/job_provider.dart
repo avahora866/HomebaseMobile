@@ -221,6 +221,10 @@ class JobProvider extends ChangeNotifier {
     jobs[index].status = JobStatus.loading;
     jobs[index].result = null;
     jobs[index].errorMessage = null;
+    // Snapshot the params as they are right now — the request below is
+    // built from them, and the result card must keep reflecting this run
+    // even if the user changes the fields afterwards.
+    jobs[index].lastRunParamValues = jobs[index].paramValues;
     notifyListeners();
 
     try {
@@ -274,6 +278,7 @@ class JobProvider extends ChangeNotifier {
     job.status = JobStatus.idle;
     job.result = null;
     job.errorMessage = null;
+    job.lastRunParamValues = null;
     // Clear all param values and reset options appropriately per job type
     final fandom = _fandomParam(job);
     if (fandom != null) {
@@ -305,6 +310,7 @@ class JobProvider extends ChangeNotifier {
       job.result = null;
       job.errorMessage = null;
       job.hasRun = false;
+      job.lastRunParamValues = null;
       for (final p in job.params) {
         p.currentValue = null;
         p.selectedValues = [];
