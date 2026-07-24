@@ -46,11 +46,12 @@ class Job {
   /// the home-screen list dot (accent once run, divider until then).
   bool hasRun;
 
-  /// Snapshot of [paramValues] taken at the moment this job was last run —
-  /// so the result card reflects what was actually run, not whatever the
-  /// param fields have since been changed to (e.g. switching the media
-  /// type dropdown after a result already came back).
-  Map<String, String?>? lastRunParamValues;
+  /// The param values as of the last run — set when [runJob] fires the
+  /// request and left untouched by further edits to the form, so the
+  /// result card keeps reflecting what was actually run (e.g. switching
+  /// the media type dropdown after a result already came back doesn't
+  /// retag it). Null until the job has been run at least once.
+  Map<String, String?>? paramValues;
 
   Job({
     required this.id,
@@ -66,16 +67,20 @@ class Job {
     this.result,
     this.errorMessage,
     this.hasRun = false,
-    this.lastRunParamValues,
+    this.paramValues,
   });
 
   bool get hasParams => params.isNotEmpty;
 
-  Map<String, String?> get paramValues =>
+  /// The param fields' current live values, as edited in the form right
+  /// now — used to build requests and to decide which dependent fields
+  /// (e.g. Fandom) are visible. Distinct from [paramValues], which only
+  /// updates once a run actually happens.
+  Map<String, String?> get liveParamValues =>
       {for (final p in params) p.key: p.currentValue};
 
   List<JobParam> get visibleParams {
-    final values = paramValues;
+    final values = liveParamValues;
     return params.where((p) => p.isVisible(values)).toList();
   }
 

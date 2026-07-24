@@ -25,7 +25,7 @@ class JobProvider extends ChangeNotifier {
     param.currentValue = value;
 
     // Clear values of params that are now hidden
-    final currentValues = job.paramValues;
+    final currentValues = job.liveParamValues;
     for (final p in job.params) {
       if (!p.isVisible(currentValues)) {
         p.currentValue = null;
@@ -224,7 +224,7 @@ class JobProvider extends ChangeNotifier {
     // Snapshot the params as they are right now — the request below is
     // built from them, and the result card must keep reflecting this run
     // even if the user changes the fields afterwards.
-    jobs[index].lastRunParamValues = jobs[index].paramValues;
+    jobs[index].paramValues = jobs[index].liveParamValues;
     notifyListeners();
 
     try {
@@ -278,7 +278,7 @@ class JobProvider extends ChangeNotifier {
     job.status = JobStatus.idle;
     job.result = null;
     job.errorMessage = null;
-    job.lastRunParamValues = null;
+    job.paramValues = null;
     // Clear all param values and reset options appropriately per job type
     final fandom = _fandomParam(job);
     if (fandom != null) {
@@ -310,7 +310,7 @@ class JobProvider extends ChangeNotifier {
       job.result = null;
       job.errorMessage = null;
       job.hasRun = false;
-      job.lastRunParamValues = null;
+      job.paramValues = null;
       for (final p in job.params) {
         p.currentValue = null;
         p.selectedValues = [];
