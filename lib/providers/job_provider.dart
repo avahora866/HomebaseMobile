@@ -34,9 +34,12 @@ class JobProvider extends ChangeNotifier {
 
     notifyListeners();
 
-    // ── Auto-fetch fandom options when fanfiction is selected ─────────
+    // ── Auto-fetch fandom/publisher options when fanfiction is selected ─
     if (jobId == 'random_media' && paramKey == 'media' && value == 'fanfiction') {
-      await _fetchFandomOptions(job);
+      await Future.wait([
+        _fetchFandomOptions(job),
+        _fetchPublisherOptions(job),
+      ]);
     }
   }
 
@@ -115,6 +118,55 @@ class JobProvider extends ChangeNotifier {
   JobParam? _fandomParam(Job job) {
     try {
       return job.params.firstWhere((p) => p.key == 'fandom');
+    } catch (_) {
+      return null;
+    }
+  }
+
+  // ── Publisher options fetch ────────────────────────────────────────
+
+  Future<void> _fetchPublisherOptions(Job job) async {
+    final publisherParam = _publisherParam(job);
+    if (publisherParam == null) return;
+
+    // Show loading spinner in the dropdown
+    publisherParam.isLoadingOptions = true;
+    publisherParam.options = [];
+    publisherParam.optionCounts = {};
+    publisherParam.currentValue = null;
+    notifyListeners();
+
+    try {
+      final response = await _api.get('/media/publisherOptions');
+
+      if (response['success'] == true) {
+        final data = response['data'];
+        // Each entry is {"name": "...", "unreadCount": n}
+        final entries = (data as List<dynamic>)
+            .cast<Map<String, dynamic>>()
+            .where((e) => (e['name'] as String?)?.isNotEmpty == true);
+        publisherParam.options = entries.map((e) => e['name'] as String).toList();
+        publisherParam.optionCounts = {
+          for (final e in entries)
+            e['name'] as String: (e['unreadCount'] as num?)?.toInt() ?? 0,
+        };
+      } else {
+        // Fall back to empty — user will see "no options" state
+        publisherParam.options = [];
+        publisherParam.optionCounts = {};
+      }
+    } catch (_) {
+      publisherParam.options = [];
+      publisherParam.optionCounts = {};
+    } finally {
+      publisherParam.isLoadingOptions = false;
+      notifyListeners();
+    }
+  }
+
+  JobParam? _publisherParam(Job job) {
+    try {
+      return job.params.firstWhere((p) => p.key == 'publisher');
     } catch (_) {
       return null;
     }
@@ -289,6 +341,15 @@ class JobProvider extends ChangeNotifier {
       fandom.currentValue = null;
       fandom.selectedValues = [];
     }
+    final publisher = _publisherParam(job);
+    if (publisher != null) {
+      // Publisher options are fetched on demand (when fanfiction is selected),
+      // so clear them fully so they re-load next time.
+      publisher.options = [];
+      publisher.optionCounts = {};
+      publisher.currentValue = null;
+      publisher.selectedValues = [];
+    }
     final category = _categoryParam(job);
     if (category != null) {
       // Category options are fetched on screen open and are stable,
@@ -297,7 +358,7 @@ class JobProvider extends ChangeNotifier {
       category.selectedValues = [];
     }
     for (final p in job.params) {
-      if (p.key == 'fandom' || p.key == 'category') continue;
+      if (p.key == 'fandom' || p.key == 'publisher' || p.key == 'category') continue;
       p.currentValue = null;
       p.selectedValues = [];
     }
@@ -320,6 +381,12 @@ class JobProvider extends ChangeNotifier {
         fandom.options = [];
         fandom.optionCounts = {};
         fandom.selectedValues = [];
+      }
+      final publisher = _publisherParam(job);
+      if (publisher != null) {
+        publisher.options = [];
+        publisher.optionCounts = {};
+        publisher.selectedValues = [];
       }
     }
     notifyListeners();

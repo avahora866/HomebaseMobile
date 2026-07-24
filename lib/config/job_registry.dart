@@ -22,7 +22,7 @@ final List<Job> jobRegistry = [
     id: 'random_media',
     name: 'Random Media',
     description: 'Get a random media recommendation. '
-        'Choose a type and, for fanfiction, a fandom.',
+        'Choose a type and, for fanfiction, a fandom and/or publisher.',
     endpoint: '/media/randomPicker',
     method: 'GET',
     category: JobCategory.media,
@@ -37,6 +37,16 @@ final List<Job> jobRegistry = [
       JobParam(
         key: 'fandom',
         label: 'Fandom',
+        inputType: ParamInputType.multiSelectDropdown,
+        required: false,
+        // Options start empty — populated by API call when fanfiction is chosen
+        options: [],
+        dependsOnKey: 'media',
+        dependsOnValue: 'fanfiction',
+      ),
+      JobParam(
+        key: 'publisher',
+        label: 'Publisher',
         inputType: ParamInputType.multiSelectDropdown,
         required: false,
         // Options start empty — populated by API call when fanfiction is chosen
