@@ -92,10 +92,12 @@ class _SearchablePickerSheetState extends State<_SearchablePickerSheet> {
       // Push the sheet up as the keyboard slides in
       padding: EdgeInsets.only(bottom: bottomInset),
       child: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: AppColors.bg,
-          border: Border(top: BorderSide(color: AppColors.divider, width: 2)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.sheet)),
+          border: const Border(top: BorderSide(color: AppColors.divider, width: 2)),
         ),
+        clipBehavior: Clip.antiAlias,
         constraints: BoxConstraints(maxHeight: screenHeight * 0.75),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -158,17 +160,17 @@ class _SearchablePickerSheetState extends State<_SearchablePickerSheet> {
                       : null,
                   filled: true,
                   fillColor: AppColors.surface,
-                  border: const OutlineInputBorder(
-                    borderRadius: BorderRadius.zero,
-                    borderSide: BorderSide(color: AppColors.divider),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppRadius.field),
+                    borderSide: const BorderSide(color: AppColors.divider),
                   ),
-                  enabledBorder: const OutlineInputBorder(
-                    borderRadius: BorderRadius.zero,
-                    borderSide: BorderSide(color: AppColors.divider),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppRadius.field),
+                    borderSide: const BorderSide(color: AppColors.divider),
                   ),
-                  focusedBorder: const OutlineInputBorder(
-                    borderRadius: BorderRadius.zero,
-                    borderSide: BorderSide(color: AppColors.accent, width: 1.5),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppRadius.field),
+                    borderSide: const BorderSide(color: AppColors.accent, width: 1.5),
                   ),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
                 ),
@@ -255,6 +257,7 @@ class _OptionTile extends StatelessWidget {
                 height: 18,
                 decoration: BoxDecoration(
                   color: selected ? AppColors.accent : Colors.transparent,
+                  borderRadius: BorderRadius.circular(4),
                   border: Border.all(color: selected ? AppColors.accent : AppColors.divider),
                 ),
                 child: selected

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'providers/job_provider.dart';
-import 'providers/env_provider.dart';
 import 'screens/home_screen.dart';
 import 'theme/app_theme.dart';
 
@@ -17,11 +16,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => EnvProvider()),
-        ChangeNotifierProvider(create: (_) => JobProvider()),
-      ],
+    return ChangeNotifierProvider(
+      create: (_) => JobProvider(),
       child: MaterialApp(
         title: 'Homebase',
         debugShowCheckedModeBanner: false,

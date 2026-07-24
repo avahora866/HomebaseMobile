@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../providers/env_provider.dart';
+import '../config/app_config.dart';
 import '../theme/app_theme.dart';
 import '../widgets/atoms.dart';
 
@@ -35,47 +34,6 @@ class SettingsScreen extends StatelessWidget {
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(18, 16, 18, 40),
                 children: [
-                  const SectionKicker('Environment', margin: EdgeInsets.only(bottom: 10)),
-                  Consumer<EnvProvider>(
-                    builder: (context, env, _) {
-                      return Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: AppColors.surface,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: AppColors.divider),
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(env.label, style: AppTypography.heading(15, weight: FontWeight.w600)),
-                                  const SizedBox(height: 2),
-                                  Text(env.target, style: AppTypography.mono(12, color: AppColors.ink(0.6))),
-                                ],
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: env.toggle,
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 200),
-                                width: 44,
-                                height: 26,
-                                padding: const EdgeInsets.symmetric(horizontal: 3),
-                                alignment: env.isDev ? Alignment.centerLeft : Alignment.centerRight,
-                                color: env.isDev ? AppColors.divider : AppColors.accent,
-                                child: Container(width: 20, height: 20, color: AppColors.bg),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 24),
                   const SectionKicker('About', margin: EdgeInsets.only(bottom: 10)),
                   Container(
                     padding: const EdgeInsets.all(16),
@@ -84,9 +42,20 @@ class SettingsScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(color: AppColors.divider),
                     ),
-                    child: Text(
-                      'Homebase — a personal dev tool for triggering server endpoint jobs.',
-                      style: AppTypography.body(13, color: AppColors.ink(0.75)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Homebase — a personal dev tool for triggering server endpoint jobs.',
+                          style: AppTypography.body(13, color: AppColors.ink(0.75)),
+                        ),
+                        const SizedBox(height: 12),
+                        const ThickDivider(),
+                        const SizedBox(height: 12),
+                        Text('Server', style: AppTypography.body(12, color: AppColors.ink(0.55))),
+                        const SizedBox(height: 3),
+                        Text(AppConfig.baseUrl, style: AppTypography.mono(12, color: AppColors.accent)),
+                      ],
                     ),
                   ),
                 ],

@@ -12,7 +12,11 @@ class ResetSuccessCard extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 22),
-      decoration: BoxDecoration(color: AppColors.accent100, border: Border.all(color: AppColors.accent)),
+      decoration: BoxDecoration(
+        color: AppColors.accent100,
+        borderRadius: BorderRadius.circular(AppRadius.card),
+        border: Border.all(color: AppColors.accent),
+      ),
       child: Column(
         children: [
           Container(
@@ -49,7 +53,11 @@ class EmptyResultCard extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-      decoration: BoxDecoration(color: AppColors.surface, border: Border.all(color: AppColors.divider)),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppRadius.card),
+        border: Border.all(color: AppColors.divider),
+      ),
       child: Column(
         children: [
           Icon(Icons.search_off_rounded, size: 30, color: AppColors.ink(0.4)),
@@ -76,9 +84,10 @@ class ErrorResultCard extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.surface,
-        border: Border(left: BorderSide(color: AppColors.neutral900, width: 3)),
+        borderRadius: BorderRadius.circular(AppRadius.card),
+        border: const Border(left: BorderSide(color: AppColors.neutral900, width: 3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

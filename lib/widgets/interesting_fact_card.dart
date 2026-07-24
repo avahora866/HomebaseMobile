@@ -15,9 +15,10 @@ class InterestingFactCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.surface,
-        border: Border(left: BorderSide(color: AppColors.accent, width: 3)),
+        borderRadius: BorderRadius.circular(AppRadius.card),
+        border: const Border(left: BorderSide(color: AppColors.accent, width: 3)),
       ),
       padding: const EdgeInsets.all(20),
       child: MarkdownBody(

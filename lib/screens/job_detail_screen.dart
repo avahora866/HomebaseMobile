@@ -294,7 +294,11 @@ class _JsonResultCard extends StatelessWidget {
       width: double.infinity,
       constraints: const BoxConstraints(maxHeight: 420),
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: AppColors.surface, border: Border.all(color: AppColors.divider)),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppRadius.card),
+        border: Border.all(color: AppColors.divider),
+      ),
       child: SingleChildScrollView(
         child: SelectableText(content, style: AppTypography.mono(13, color: AppColors.ink(0.8))),
       ),

@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
 /// The `.tag.tag-outline` component: an accent-outlined label used for HTTP
-/// methods and category pills throughout the design. Square corners — the
-/// base `.tag` class inherits `--radius-md` (0) since the prototype never
-/// overrides it on this element.
+/// methods and category pills throughout the design.
 class OutlineTag extends StatelessWidget {
   final String label;
   final double? minWidth;
@@ -18,6 +16,7 @@ class OutlineTag extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
       decoration: BoxDecoration(
         border: Border.all(color: AppColors.accent),
+        borderRadius: BorderRadius.circular(AppRadius.tag),
       ),
       child: Text(
         label,

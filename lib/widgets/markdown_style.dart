@@ -3,7 +3,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import '../theme/app_theme.dart';
 
 /// Shared markdown styling for server-returned content (interesting facts,
-/// trunk notes) — Archivo throughout, accent-toned code/quotes, square
+/// trunk notes) — Archivo throughout, accent-toned code/quotes, rounded
 /// corners, matching the modernist system.
 MarkdownStyleSheet modernistMarkdownStyle({Color accent = AppColors.accent}) {
   return MarkdownStyleSheet(
@@ -16,6 +16,7 @@ MarkdownStyleSheet modernistMarkdownStyle({Color accent = AppColors.accent}) {
     code: AppTypography.mono(13, color: AppColors.accent800),
     codeblockDecoration: BoxDecoration(
       color: AppColors.accent100,
+      borderRadius: BorderRadius.circular(AppRadius.tag),
       border: Border.all(color: accent.withValues(alpha: 0.3)),
     ),
     blockquoteDecoration: BoxDecoration(

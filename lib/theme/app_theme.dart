@@ -57,6 +57,19 @@ class AppSpacing {
   static const s8 = 32.0;
 }
 
+/// ── Corner radius scale ───────────────────────────────────────────────
+/// Every filled/bordered surface in the app is rounded — small controls
+/// (tags, checkboxes) get a light touch, cards and result surfaces get the
+/// prototype's 16px, pills stay fully round.
+class AppRadius {
+  AppRadius._();
+  static const tag = 6.0;
+  static const field = 12.0;
+  static const card = 16.0;
+  static const sheet = 20.0;
+  static const pill = 20.0;
+}
+
 /// ── Typography ────────────────────────────────────────────────────────
 /// Archivo for both heading and body, per the design system — headings at
 /// weight 800.
@@ -146,7 +159,7 @@ class AppTheme {
       snackBarTheme: SnackBarThemeData(
         backgroundColor: AppColors.text,
         contentTextStyle: AppTypography.body(14, color: AppColors.bg),
-        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.field)),
         behavior: SnackBarBehavior.floating,
       ),
     );

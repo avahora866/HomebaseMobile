@@ -4,6 +4,11 @@ import 'package:url_launcher/url_launcher.dart';
 import '../theme/app_theme.dart';
 import 'atoms.dart';
 
+/// Media types that never have cover art — fanfiction, podcasts and web
+/// novels don't carry a poster/cover image the way novels, comics, manga,
+/// movies, shows or anime do, so their result card skips the placeholder.
+const _typesWithoutCoverArt = {'fanfiction', 'podcast', 'webnovel'};
+
 /// Displayed when /media/randomPicker returns successfully. [result] is a
 /// MediaPickResult: {media: {name, summary, notionUrl, url?}, count: n}
 /// where count is how many items still match the filter used to pick this
@@ -22,32 +27,36 @@ class MediaResultCard extends StatelessWidget {
     final notionUrl = media['notionUrl']?.toString() ?? '';
     final url = media['url']?.toString();
     final count = (result['count'] as num?)?.toInt();
+    final hasCoverArt = !_typesWithoutCoverArt.contains(category?.toLowerCase());
 
     return Container(
       width: double.infinity,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppRadius.card),
         border: Border.all(color: AppColors.divider),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Cover placeholder — the prototype's diagonal-stripe fill ──
-          AspectRatio(
-            aspectRatio: 16 / 9,
-            child: Container(
-              color: AppColors.neutral200,
-              alignment: Alignment.center,
-              child: CustomPaint(
-                painter: _StripePainter(),
-                child: Center(
-                  child: Text('cover art',
-                      style: AppTypography.mono(11, color: AppColors.ink(0.5))),
+          // ── Cover placeholder — the prototype's diagonal-stripe fill.
+          // Skipped for types that never have cover art (see above).
+          if (hasCoverArt)
+            AspectRatio(
+              aspectRatio: 16 / 9,
+              child: Container(
+                color: AppColors.neutral200,
+                alignment: Alignment.center,
+                child: CustomPaint(
+                  painter: _StripePainter(),
+                  child: Center(
+                    child: Text('cover art',
+                        style: AppTypography.mono(11, color: AppColors.ink(0.5))),
+                  ),
                 ),
               ),
             ),
-          ),
 
           Padding(
             padding: const EdgeInsets.all(16),

@@ -15,7 +15,7 @@ class ApiService {
   Map<String, String> get _headers => {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        if (AppConfig.isProd) 'X-Internal-Header': _xInternalHeaderValue,
+        'X-Internal-Header': _xInternalHeaderValue,
       };
 
   Uri _buildUri(String endpoint) {

@@ -154,6 +154,7 @@ class _MultiSelectField extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                         decoration: BoxDecoration(
                           color: AppColors.accent100,
+                          borderRadius: BorderRadius.circular(AppRadius.pill),
                           border: Border.all(color: AppColors.accent),
                         ),
                         child: Row(
@@ -203,6 +204,7 @@ class _PickerTrigger extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 14),
       decoration: BoxDecoration(
         color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppRadius.field),
         border: Border.all(color: enabled ? AppColors.divider : AppColors.divider.withValues(alpha: 0.4)),
       ),
       child: Row(
@@ -243,7 +245,11 @@ class _LoadingField extends StatelessWidget {
     return Container(
       height: 48,
       padding: const EdgeInsets.symmetric(horizontal: 14),
-      decoration: BoxDecoration(color: AppColors.surface, border: Border.all(color: AppColors.divider)),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppRadius.field),
+        border: Border.all(color: AppColors.divider),
+      ),
       child: Row(
         children: [
           SizedBox(
@@ -280,9 +286,13 @@ class _TextInputField extends StatelessWidget {
           hintStyle: AppTypography.body(14, color: AppColors.ink(0.45)),
           filled: true,
           fillColor: AppColors.surface,
-          border: const OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.divider)),
-          enabledBorder: const OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.divider)),
-          focusedBorder: const OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppColors.accent, width: 1.5)),
+          border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppRadius.field), borderSide: const BorderSide(color: AppColors.divider)),
+          enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppRadius.field), borderSide: const BorderSide(color: AppColors.divider)),
+          focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppRadius.field),
+              borderSide: const BorderSide(color: AppColors.accent, width: 1.5)),
           contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
         ),
         onChanged: onChanged,
