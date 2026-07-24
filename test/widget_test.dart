@@ -1,30 +1,45 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
+import 'dart:ui';
 
-import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:homebase_mobile/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
+  setUp(() {
+    // main() normally awaits dotenv.load() before runApp() — the job
+    // registry reads a secret from it at construction time, so tests that
+    // pump MyApp() directly need it initialised too.
+    dotenv.testLoad(fileInput: 'X_INTERNAL_HEADER=test\nGAS_SECRET=test');
+  });
+
+  testWidgets('Home screen renders the job list', (WidgetTester tester) async {
+    // Use a tall viewport so the whole (short) job list fits without
+    // needing to scroll to find items below the fold.
+    tester.view.physicalSize = const Size(800, 2400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
     await tester.pumpWidget(const MyApp());
+    await tester.pumpAndSettle();
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // "Homebase" appears twice: the header title and the (off-screen) drawer title.
+    expect(find.text('Homebase'), findsNWidgets(2));
+    // "Interesting Fact" appears twice: the category filter chip and the job name.
+    expect(find.text('Random Media'), findsOneWidget);
+    expect(find.text('Interesting Fact'), findsAtLeastNWidgets(1));
+    expect(find.text('Random Trunk'), findsOneWidget);
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+  testWidgets('Tapping a job opens its detail screen', (WidgetTester tester) async {
+    await tester.pumpWidget(const MyApp());
+    await tester.pumpAndSettle();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    await tester.tap(find.text('Random Media'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Run'), findsOneWidget);
+    expect(find.text('Method'), findsOneWidget);
   });
 }
