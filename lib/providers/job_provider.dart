@@ -41,6 +41,11 @@ class JobProvider extends ChangeNotifier {
         _fetchPublisherOptions(job),
       ]);
     }
+
+    // ── Publisher chosen: narrow the fandom counts to that publisher ───
+    if (jobId == 'random_media' && paramKey == 'publisher') {
+      await _refreshFandomCounts(job);
+    }
   }
 
   // ── Job option initialisation (called when a job screen opens) ────
@@ -72,6 +77,11 @@ class JobProvider extends ChangeNotifier {
     }
     param.selectedValues = current;
     notifyListeners();
+
+    // ── Fandom selection changed: narrow the publisher counts to it ────
+    if (jobId == 'random_media' && paramKey == 'fandom') {
+      _refreshPublisherCounts(job);
+    }
   }
 
   // ── Fandom options fetch ───────────────────────────────────────────
@@ -123,6 +133,42 @@ class JobProvider extends ChangeNotifier {
     }
   }
 
+  /// Recomputes fandom counts filtered by the currently selected publisher
+  /// (or unfiltered if none is selected). Leaves the option list and any
+  /// selected fandoms untouched — only the counts refresh.
+  Future<void> _refreshFandomCounts(Job job) async {
+    final fandomParam = _fandomParam(job);
+    if (fandomParam == null || fandomParam.options.isEmpty) return;
+
+    final publisherValue = _publisherParam(job)?.currentValue;
+
+    fandomParam.isLoadingOptionCounts = true;
+    notifyListeners();
+
+    final query = (publisherValue != null && publisherValue.isNotEmpty)
+        ? '?publisher=${Uri.encodeComponent(publisherValue)}'
+        : '';
+
+    try {
+      final response = await _api.get('/media/fandomOptions$query');
+      if (response['success'] == true) {
+        final data = response['data'];
+        final entries = (data as List<dynamic>)
+            .cast<Map<String, dynamic>>()
+            .where((e) => (e['name'] as String?)?.isNotEmpty == true);
+        fandomParam.optionCounts = {
+          for (final e in entries)
+            e['name'] as String: (e['unreadCount'] as num?)?.toInt() ?? 0,
+        };
+      }
+    } catch (_) {
+      // Leave the previous counts in place on failure
+    } finally {
+      fandomParam.isLoadingOptionCounts = false;
+      notifyListeners();
+    }
+  }
+
   // ── Publisher options fetch ────────────────────────────────────────
 
   Future<void> _fetchPublisherOptions(Job job) async {
@@ -169,6 +215,42 @@ class JobProvider extends ChangeNotifier {
       return job.params.firstWhere((p) => p.key == 'publisher');
     } catch (_) {
       return null;
+    }
+  }
+
+  /// Recomputes publisher counts filtered by the currently selected
+  /// fandom(s) (or unfiltered if none are selected). Leaves the option list
+  /// and the selected publisher untouched — only the counts refresh.
+  Future<void> _refreshPublisherCounts(Job job) async {
+    final publisherParam = _publisherParam(job);
+    if (publisherParam == null || publisherParam.options.isEmpty) return;
+
+    final fandomValue = _fandomParam(job)?.commaSeparatedValues ?? '';
+
+    publisherParam.isLoadingOptionCounts = true;
+    notifyListeners();
+
+    final query = fandomValue.isNotEmpty
+        ? '?fandom=${Uri.encodeComponent(fandomValue)}'
+        : '';
+
+    try {
+      final response = await _api.get('/media/publisherOptions$query');
+      if (response['success'] == true) {
+        final data = response['data'];
+        final entries = (data as List<dynamic>)
+            .cast<Map<String, dynamic>>()
+            .where((e) => (e['name'] as String?)?.isNotEmpty == true);
+        publisherParam.optionCounts = {
+          for (final e in entries)
+            e['name'] as String: (e['unreadCount'] as num?)?.toInt() ?? 0,
+        };
+      }
+    } catch (_) {
+      // Leave the previous counts in place on failure
+    } finally {
+      publisherParam.isLoadingOptionCounts = false;
+      notifyListeners();
     }
   }
 

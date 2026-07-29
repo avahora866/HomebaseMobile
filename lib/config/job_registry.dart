@@ -47,7 +47,7 @@ final List<Job> jobRegistry = [
       JobParam(
         key: 'publisher',
         label: 'Publisher',
-        inputType: ParamInputType.multiSelectDropdown,
+        inputType: ParamInputType.dropdown,
         required: false,
         // Options start empty — populated by API call when fanfiction is chosen
         options: [],
