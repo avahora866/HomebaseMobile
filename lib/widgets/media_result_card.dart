@@ -9,6 +9,10 @@ import 'atoms.dart';
 /// movies, shows or anime do, so their result card skips the placeholder.
 const _typesWithoutCoverArt = {'fanfiction', 'podcast', 'webnovel'};
 
+/// Media types backed by TMDB, so a search link can be built from the title
+/// even though the backend doesn't store one (unlike fanfiction's `url`).
+const _tmdbTypes = {'movie', 'animatedmovie', 'tvshow'};
+
 /// Displayed when /media/randomPicker returns successfully. [result] is a
 /// MediaPickResult: {media: {name, summary, notionUrl, url?}, count: n}
 /// where count is how many items still match the filter used to pick this
@@ -28,6 +32,9 @@ class MediaResultCard extends StatelessWidget {
     final url = media['url']?.toString();
     final count = (result['count'] as num?)?.toInt();
     final hasCoverArt = !_typesWithoutCoverArt.contains(category?.toLowerCase());
+    final tmdbUrl = _tmdbTypes.contains(category?.toLowerCase()) && name != '—'
+        ? Uri.https('www.themoviedb.org', '/search', {'query': name}).toString()
+        : null;
 
     return Container(
       width: double.infinity,
@@ -84,6 +91,10 @@ class MediaResultCard extends StatelessWidget {
                 if (url != null && url.isNotEmpty) ...[
                   const SizedBox(height: 8),
                   _LinkRow(label: 'Link', url: url),
+                ],
+                if (tmdbUrl != null) ...[
+                  const SizedBox(height: 8),
+                  _LinkRow(label: 'TMDB', url: tmdbUrl),
                 ],
               ],
             ),
