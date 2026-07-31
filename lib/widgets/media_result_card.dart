@@ -9,9 +9,10 @@ import 'atoms.dart';
 /// movies, shows or anime do, so their result card skips the placeholder.
 const _typesWithoutCoverArt = {'fanfiction', 'podcast', 'webnovel'};
 
-/// Media types backed by TMDB, so a search link can be built from the title
-/// even though the backend doesn't store one (unlike fanfiction's `url`).
-const _tmdbTypes = {'movie', 'animatedmovie', 'tvshow'};
+/// Media types backed by TMDB (movies, TV shows and anime, which TMDB lists
+/// as TV), so a search link can be built from the title even though the
+/// backend doesn't store one (unlike fanfiction's `url`).
+const _tmdbTypes = {'movie', 'animatedmovie', 'tvshow', 'anime'};
 
 /// Displayed when /media/randomPicker returns successfully. [result] is a
 /// MediaPickResult: {media: {name, summary, notionUrl, url?}, count: n}
