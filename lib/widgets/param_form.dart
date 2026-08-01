@@ -62,6 +62,13 @@ class _SearchableDropdownField extends StatelessWidget {
   final ValueChanged<String?> onChanged;
   const _SearchableDropdownField({required this.param, required this.onChanged});
 
+  /// Display label for an option — title-cased for the media type dropdown,
+  /// left as-is (aside from any count suffix) for everything else.
+  String _displayLabel(String opt) {
+    final raw = _countLabelBuilder(param)?.call(opt) ?? opt;
+    return param.key == 'media' ? _titleCase(raw) : raw;
+  }
+
   @override
   Widget build(BuildContext context) {
     final hasSelection = param.options.contains(param.currentValue);
@@ -81,17 +88,29 @@ class _SearchableDropdownField extends StatelessWidget {
                         selectedValues: hasSelection ? [param.currentValue!] : [],
                         multiSelect: false,
                         onToggle: (val) => onChanged(val),
-                        labelBuilder: _countLabelBuilder(param),
+                        labelBuilder: _displayLabel,
                       ),
               child: _PickerTrigger(
                 placeholder: param.options.isEmpty ? 'No options available' : 'Select ${param.label}',
-                displayValue: hasSelection ? param.currentValue : null,
+                displayValue: hasSelection ? _displayLabel(param.currentValue!) : null,
                 enabled: param.options.isNotEmpty,
                 loading: param.isLoadingOptionCounts,
               ),
             ),
     );
   }
+}
+
+/// Splits a camelCase or lowercase option value into title-cased words,
+/// e.g. 'animatedMovie' -> 'Animated Movie', 'novel' -> 'Novel'.
+String _titleCase(String value) {
+  final spaced = value.replaceAllMapped(
+      RegExp(r'(?<=[a-z0-9])(?=[A-Z])'), (m) => ' ');
+  return spaced
+      .split(RegExp(r'[\s_-]+'))
+      .where((w) => w.isNotEmpty)
+      .map((w) => w[0].toUpperCase() + w.substring(1))
+      .join(' ');
 }
 
 /// Builds a per-option display label showing its count once known, an
