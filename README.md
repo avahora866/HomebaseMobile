@@ -9,6 +9,8 @@ Visual design: the **modernist** system from the Job Runner Mobile Redesign hand
 architectural, set in Archivo, a single green accent (`#178A4F`) on paper, strong 2px dividers,
 rounded corners on every card, field and result surface.
 
+# Build command
+flutter build apk --dart-define-from-file=.env
 ---
 
 ## Setup
@@ -83,3 +85,5 @@ Job(
 
 Jobs are grouped on the home screen by `JobCategory` (`media`, `interestingFact`, `cs`) in
 declaration order.
+
+
