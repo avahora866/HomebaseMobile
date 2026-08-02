@@ -62,11 +62,15 @@ class _SearchableDropdownField extends StatelessWidget {
   final ValueChanged<String?> onChanged;
   const _SearchableDropdownField({required this.param, required this.onChanged});
 
-  /// Display label for an option — title-cased for the media type dropdown,
-  /// left as-is (aside from any count suffix) for everything else.
+  /// Display label for an option — title-cased (with known acronym/compound
+  /// overrides) for the media type dropdown, left as-is aside from any count
+  /// suffix for everything else.
   String _displayLabel(String opt) {
-    final raw = _countLabelBuilder(param)?.call(opt) ?? opt;
-    return param.key == 'media' ? _titleCase(raw) : raw;
+    if (param.key != 'media') return _countLabelBuilder(param)?.call(opt) ?? opt;
+    final base = _mediaTypeLabelOverrides[opt] ?? _titleCase(opt);
+    final count = param.optionCounts[opt];
+    if (count != null) return '$base ($count)';
+    return param.isLoadingOptionCounts ? '$base (…)' : base;
   }
 
   @override
@@ -100,6 +104,14 @@ class _SearchableDropdownField extends StatelessWidget {
     );
   }
 }
+
+/// Media type values that read as one run-together word (no camelCase
+/// boundary for [_titleCase] to split on) and need an explicit two-word
+/// display label.
+const _mediaTypeLabelOverrides = {
+  'tvshow': 'TV Show',
+  'webnovel': 'Web Novel',
+};
 
 /// Splits a camelCase or lowercase option value into title-cased words,
 /// e.g. 'animatedMovie' -> 'Animated Movie', 'novel' -> 'Novel'.
