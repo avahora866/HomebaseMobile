@@ -5,6 +5,7 @@ import '../providers/job_provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/job_card.dart';
+import 'budget_screen.dart';
 import 'job_detail_screen.dart';
 import 'settings_screen.dart';
 
@@ -22,6 +23,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _openDetail(String jobId) {
     Navigator.of(context).push(_slideRoute(JobDetailScreen(jobId: jobId)));
+  }
+
+  void _openBudget() {
+    setState(() => _drawerOpen = false);
+    Navigator.of(context).push(_slideRoute(const BudgetScreen()));
   }
 
   void _openSettings() {
@@ -121,6 +127,7 @@ class _HomeScreenState extends State<HomeScreen> {
               active: DrawerDestination.home,
               onClose: () => setState(() => _drawerOpen = false),
               onHome: () => setState(() => _drawerOpen = false),
+              onBudget: _openBudget,
               onSettings: _openSettings,
             ),
           ],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
+import 'providers/budget_provider.dart';
 import 'providers/job_provider.dart';
 import 'screens/home_screen.dart';
 import 'theme/app_theme.dart';
@@ -16,8 +17,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => JobProvider(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => JobProvider()),
+        ChangeNotifierProvider(create: (_) => BudgetProvider()),
+      ],
       child: MaterialApp(
         title: 'Homebase',
         debugShowCheckedModeBanner: false,
