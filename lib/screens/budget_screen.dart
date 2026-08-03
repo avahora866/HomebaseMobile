@@ -73,11 +73,13 @@ class _BudgetScreenState extends State<BudgetScreen> {
                       else if (budget.status == BudgetStatus.success) ...[
                         if (budget.summary != null) _SummaryCard(summary: budget.summary!),
                         const SizedBox(height: 24),
+                        _FilterBar(budget: budget),
+                        const SizedBox(height: 20),
                         SectionKicker('Transactions', margin: const EdgeInsets.only(bottom: 10)),
-                        if (budget.transactions.isEmpty)
+                        if (budget.filteredTransactions.isEmpty)
                           const EmptyResultCard()
                         else
-                          for (final transaction in budget.transactions)
+                          for (final transaction in budget.filteredTransactions)
                             BudgetTransactionCard(transaction: transaction),
                       ],
                     ],
@@ -118,6 +120,94 @@ class _MonthSelector extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _FilterBar extends StatelessWidget {
+  final BudgetProvider budget;
+  const _FilterBar({required this.budget});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(AppRadius.field),
+            border: Border.all(color: AppColors.divider),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.search_rounded, size: 18, color: AppColors.ink(0.6)),
+              const SizedBox(width: 8),
+              Expanded(
+                child: TextField(
+                  onChanged: budget.setSearchQuery,
+                  style: AppTypography.body(13, color: AppColors.text),
+                  decoration: InputDecoration(
+                    isDense: true,
+                    border: InputBorder.none,
+                    hintText: 'Search description or note…',
+                    hintStyle: AppTypography.body(13, color: AppColors.ink(0.6)),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 10),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            _FilterChip(
+              label: 'Subscriptions',
+              selected: budget.subscriptionOnly,
+              onTap: budget.toggleSubscriptionOnly,
+            ),
+            for (final tag in budget.availableTags)
+              _FilterChip(
+                label: tag,
+                selected: budget.selectedTags.contains(tag),
+                onTap: () => budget.toggleTag(tag),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _FilterChip extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+  const _FilterChip({required this.label, required this.selected, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: selected ? AppColors.accent : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: selected ? AppColors.accent : AppColors.divider),
+        ),
+        child: Text(
+          label,
+          style: AppTypography.heading(
+            11,
+            weight: FontWeight.w600,
+            color: selected ? AppColors.bg : AppColors.text,
+          ).copyWith(letterSpacing: 0.3),
+        ),
+      ),
     );
   }
 }
@@ -170,7 +260,7 @@ class _SummaryRow extends StatelessWidget {
       children: [
         Text(label, style: AppTypography.body(13, color: AppColors.ink(0.65))),
         Text(
-          '\$${amount.toStringAsFixed(2)}',
+          '£${amount.toStringAsFixed(2)}',
           style: AppTypography.mono(
             14,
             weight: bold ? FontWeight.w700 : FontWeight.w600,

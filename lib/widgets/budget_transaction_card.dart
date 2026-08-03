@@ -69,7 +69,7 @@ class BudgetTransactionCard extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           Text(
-            '${isIncome ? '+' : '-'}\$${transaction.amount.abs().toStringAsFixed(2)}',
+            '${isIncome ? '+' : '-'}£${transaction.amount.abs().toStringAsFixed(2)}',
             style: AppTypography.mono(
               13.5,
               weight: FontWeight.w600,

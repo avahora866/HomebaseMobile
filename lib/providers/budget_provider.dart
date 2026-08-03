@@ -17,9 +17,54 @@ class BudgetProvider extends ChangeNotifier {
   List<BudgetTransaction> transactions = [];
   String? errorMessage;
 
+  // ── Client-side filters over the fetched transactions ─────────────
+  String searchQuery = '';
+  bool subscriptionOnly = false;
+  Set<String> selectedTags = {};
+
   bool get canGoToNextMonth {
     final now = DateTime.now();
     return selectedMonth.year != now.year || selectedMonth.month != now.month;
+  }
+
+  /// Every distinct tag seen across this month's transactions, sorted —
+  /// the set of chips offered for tag filtering.
+  List<String> get availableTags {
+    final tags = <String>{};
+    for (final t in transactions) {
+      tags.addAll(t.tagList);
+    }
+    return tags.toList()..sort();
+  }
+
+  List<BudgetTransaction> get filteredTransactions {
+    final query = searchQuery.trim().toLowerCase();
+    return transactions.where((t) {
+      if (subscriptionOnly && !t.subscription) return false;
+      if (selectedTags.isNotEmpty && !t.tagList.any(selectedTags.contains)) return false;
+      if (query.isEmpty) return true;
+      final note = t.note?.toLowerCase() ?? '';
+      return t.description.toLowerCase().contains(query) || note.contains(query);
+    }).toList();
+  }
+
+  void setSearchQuery(String value) {
+    searchQuery = value;
+    notifyListeners();
+  }
+
+  void toggleSubscriptionOnly() {
+    subscriptionOnly = !subscriptionOnly;
+    notifyListeners();
+  }
+
+  void toggleTag(String tag) {
+    if (selectedTags.contains(tag)) {
+      selectedTags.remove(tag);
+    } else {
+      selectedTags.add(tag);
+    }
+    notifyListeners();
   }
 
   Future<void> load() async {
