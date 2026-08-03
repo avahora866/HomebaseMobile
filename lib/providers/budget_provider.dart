@@ -4,6 +4,8 @@ import '../services/api_service.dart';
 
 enum BudgetStatus { idle, loading, success, error }
 
+enum BudgetSortField { date, amount }
+
 /// Read-only view onto `finance/budget` — fetches the monthly summary and
 /// transaction list for [selectedMonth] together, defaulting to the
 /// current month. There is no write path here (no note/tag editing);
@@ -22,6 +24,10 @@ class BudgetProvider extends ChangeNotifier {
   bool subscriptionOnly = false;
   Set<String> selectedTags = {};
 
+  // ── Sort — defaults to date, oldest first ───────────────────────
+  BudgetSortField sortField = BudgetSortField.date;
+  bool sortAscending = true;
+
   bool get canGoToNextMonth {
     final now = DateTime.now();
     return selectedMonth.year != now.year || selectedMonth.month != now.month;
@@ -39,13 +45,21 @@ class BudgetProvider extends ChangeNotifier {
 
   List<BudgetTransaction> get filteredTransactions {
     final query = searchQuery.trim().toLowerCase();
-    return transactions.where((t) {
+    final filtered = transactions.where((t) {
       if (subscriptionOnly && !t.subscription) return false;
       if (selectedTags.isNotEmpty && !t.tagList.any(selectedTags.contains)) return false;
       if (query.isEmpty) return true;
       final note = t.note?.toLowerCase() ?? '';
       return t.description.toLowerCase().contains(query) || note.contains(query);
     }).toList();
+
+    filtered.sort((a, b) {
+      final cmp = sortField == BudgetSortField.date
+          ? a.date.compareTo(b.date)
+          : a.amount.compareTo(b.amount);
+      return sortAscending ? cmp : -cmp;
+    });
+    return filtered;
   }
 
   void setSearchQuery(String value) {
@@ -64,6 +78,16 @@ class BudgetProvider extends ChangeNotifier {
     } else {
       selectedTags.add(tag);
     }
+    notifyListeners();
+  }
+
+  void setSortField(BudgetSortField field) {
+    sortField = field;
+    notifyListeners();
+  }
+
+  void toggleSortDirection() {
+    sortAscending = !sortAscending;
     notifyListeners();
   }
 

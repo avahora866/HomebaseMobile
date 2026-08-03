@@ -74,7 +74,9 @@ class _BudgetScreenState extends State<BudgetScreen> {
                         if (budget.summary != null) _SummaryCard(summary: budget.summary!),
                         const SizedBox(height: 24),
                         _FilterBar(budget: budget),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 16),
+                        _SortBar(budget: budget),
+                        const SizedBox(height: 14),
                         SectionKicker('Transactions', margin: const EdgeInsets.only(bottom: 10)),
                         if (budget.filteredTransactions.isEmpty)
                           const EmptyResultCard()
@@ -208,6 +210,41 @@ class _FilterChip extends StatelessWidget {
           ).copyWith(letterSpacing: 0.3),
         ),
       ),
+    );
+  }
+}
+
+class _SortBar extends StatelessWidget {
+  final BudgetProvider budget;
+  const _SortBar({required this.budget});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Text('Sort', style: AppTypography.body(12, color: AppColors.ink(0.55))),
+        const SizedBox(width: 10),
+        _FilterChip(
+          label: 'Date',
+          selected: budget.sortField == BudgetSortField.date,
+          onTap: () => budget.setSortField(BudgetSortField.date),
+        ),
+        const SizedBox(width: 8),
+        _FilterChip(
+          label: 'Amount',
+          selected: budget.sortField == BudgetSortField.amount,
+          onTap: () => budget.setSortField(BudgetSortField.amount),
+        ),
+        const SizedBox(width: 10),
+        GestureDetector(
+          onTap: budget.toggleSortDirection,
+          child: Icon(
+            budget.sortAscending ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded,
+            size: 18,
+            color: AppColors.text,
+          ),
+        ),
+      ],
     );
   }
 }
