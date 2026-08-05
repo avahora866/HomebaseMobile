@@ -22,7 +22,7 @@ final List<Job> jobRegistry = [
     id: 'random_media',
     name: 'Random Media',
     description: 'Get a random media recommendation. '
-        'Choose a type and, for fanfiction, a fandom and/or publisher.',
+        'Choose a type and, for fanfiction, a fandom, publisher and/or max chapter count.',
     endpoint: '/media/randomPicker',
     method: 'GET',
     category: JobCategory.media,
@@ -51,6 +51,15 @@ final List<Job> jobRegistry = [
         required: false,
         // Options start empty — populated by API call when fanfiction is chosen
         options: [],
+        dependsOnKey: 'media',
+        dependsOnValue: 'fanfiction',
+      ),
+      JobParam(
+        key: 'maxChapters',
+        label: 'Max Chapters',
+        inputType: ParamInputType.dropdown,
+        required: false,
+        options: ['10', '25', '50', '100', '200'],
         dependsOnKey: 'media',
         dependsOnValue: 'fanfiction',
       ),
