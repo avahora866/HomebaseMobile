@@ -3,13 +3,8 @@ import '../models/budget.dart';
 import '../theme/app_theme.dart';
 import 'atoms.dart';
 
-const List<String> _monthNames = [
-  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-];
-
-/// A single read-only transaction row: date, description, source, any
-/// tags, and the amount — green for income, ink for spending.
+/// A single read-only transaction row: weekday + date, description, source,
+/// any tags, and the amount — green for income, ink for spending.
 class BudgetTransactionCard extends StatelessWidget {
   final BudgetTransaction transaction;
   const BudgetTransactionCard({super.key, required this.transaction});
@@ -18,7 +13,7 @@ class BudgetTransactionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isIncome = transaction.amount > 0;
     final date = transaction.date;
-    final dateLabel = '${_monthNames[date.month - 1]} ${date.day}';
+    final dateLabel = '${kMonthAbbr[date.month - 1]} ${date.day}';
 
     return Container(
       padding: const EdgeInsets.all(12),
@@ -33,7 +28,17 @@ class BudgetTransactionCard extends StatelessWidget {
         children: [
           SizedBox(
             width: 44,
-            child: Text(dateLabel, style: AppTypography.body(11.5, color: AppColors.ink(0.55))),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  transaction.weekdayLabel,
+                  style: AppTypography.heading(11.5, weight: FontWeight.w700),
+                ),
+                const SizedBox(height: 2),
+                Text(dateLabel, style: AppTypography.body(11.5, color: AppColors.ink(0.55))),
+              ],
+            ),
           ),
           const SizedBox(width: 10),
           Expanded(

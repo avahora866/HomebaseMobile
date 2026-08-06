@@ -1,3 +1,15 @@
+/// Short weekday names indexed by `DateTime.weekday - 1` (Monday first),
+/// shared by the transaction rows and the day-of-week filter chips.
+const List<String> kWeekdayNames = [
+  'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun',
+];
+
+/// Short month names indexed by `DateTime.month - 1`.
+const List<String> kMonthAbbr = [
+  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+];
+
 class BudgetSummary {
   final String month;
   final double totalIncome;
@@ -44,6 +56,9 @@ class BudgetTransaction {
 
   List<String> get tagList =>
       tags.split(',').map((t) => t.trim()).where((t) => t.isNotEmpty).toList();
+
+  /// 'Mon', 'Tue', … for the day this transaction landed on.
+  String get weekdayLabel => kWeekdayNames[date.weekday - 1];
 
   factory BudgetTransaction.fromJson(Map<String, dynamic> json) {
     return BudgetTransaction(
