@@ -47,20 +47,32 @@ lib/
 │   ├── app_config.dart              # ✏️ Prod base URL, GAS url/secret
 │   └── job_registry.dart            # ✏️ Add your jobs/endpoints here
 ├── models/
+│   ├── budget.dart                  # Monthly summary + transaction models
 │   ├── job.dart                     # Job data model
-│   └── job_param.dart               # Job parameter model
+│   ├── job_param.dart               # Job parameter model
+│   └── net_worth.dart               # Net worth account/category/summary models
 ├── providers/
-│   └── job_provider.dart            # Job running logic, param option fetching
+│   ├── budget_provider.dart         # Budget month/filter/sort state (read-only)
+│   ├── job_provider.dart            # Job running logic, param option fetching
+│   └── net_worth_provider.dart      # Net worth accounts + add/edit/delete
 ├── services/
 │   └── api_service.dart             # HTTP client wrapper
 ├── theme/
 │   └── app_theme.dart               # Modernist design tokens (colors, type, spacing, radius)
+├── utils/
+│   └── formatting.dart              # GBP formatting
 ├── screens/
 │   ├── home_screen.dart             # Job list, search, category chips, drawer
 │   ├── job_detail_screen.dart       # Run a job, view results
+│   ├── budget_screen.dart           # Finance → Budget (read-only)
+│   ├── net_worth_screen.dart        # Finance → Net Worth (add/edit/delete)
 │   └── settings_screen.dart         # About / server info
 └── widgets/                         # Job card, param form, result cards, etc.
 ```
+
+The drawer groups the two finance screens under a **Finance** parent: **Budget** (read-only
+month summary + transactions) and **Net Worth** (the hand-maintained balances behind
+`finance/networth`, fully editable from the phone).
 
 ## ✏️ The two files you'll usually touch
 

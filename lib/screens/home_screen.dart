@@ -7,6 +7,7 @@ import '../widgets/app_drawer.dart';
 import '../widgets/job_card.dart';
 import 'budget_screen.dart';
 import 'job_detail_screen.dart';
+import 'net_worth_screen.dart';
 import 'settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -28,6 +29,11 @@ class _HomeScreenState extends State<HomeScreen> {
   void _openBudget() {
     setState(() => _drawerOpen = false);
     Navigator.of(context).push(_slideRoute(const BudgetScreen()));
+  }
+
+  void _openNetWorth() {
+    setState(() => _drawerOpen = false);
+    Navigator.of(context).push(_slideRoute(const NetWorthScreen()));
   }
 
   void _openSettings() {
@@ -128,6 +134,7 @@ class _HomeScreenState extends State<HomeScreen> {
               onClose: () => setState(() => _drawerOpen = false),
               onHome: () => setState(() => _drawerOpen = false),
               onBudget: _openBudget,
+              onNetWorth: _openNetWorth,
               onSettings: _openSettings,
             ),
           ],
