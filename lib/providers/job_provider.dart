@@ -46,6 +46,14 @@ class JobProvider extends ChangeNotifier {
     if (jobId == 'random_media' && paramKey == 'publisher') {
       await _refreshFandomCounts(job);
     }
+
+    // ── Max chapters chosen: narrow both fandom and publisher counts ───
+    if (jobId == 'random_media' && paramKey == 'maxChapters') {
+      await Future.wait([
+        _refreshFandomCounts(job),
+        _refreshPublisherCounts(job),
+      ]);
+    }
   }
 
   // ── Job option initialisation (called when a job screen opens) ────
@@ -134,20 +142,23 @@ class JobProvider extends ChangeNotifier {
   }
 
   /// Recomputes fandom counts filtered by the currently selected publisher
-  /// (or unfiltered if none is selected). Leaves the option list and any
-  /// selected fandoms untouched — only the counts refresh.
+  /// and/or max chapters (or unfiltered if neither is set). Leaves the
+  /// option list and any selected fandoms untouched — only the counts
+  /// refresh.
   Future<void> _refreshFandomCounts(Job job) async {
     final fandomParam = _fandomParam(job);
     if (fandomParam == null || fandomParam.options.isEmpty) return;
 
     final publisherValue = _publisherParam(job)?.currentValue;
+    final maxChaptersValue = _maxChaptersParam(job)?.currentValue;
 
     fandomParam.isLoadingOptionCounts = true;
     notifyListeners();
 
-    final query = (publisherValue != null && publisherValue.isNotEmpty)
-        ? '?publisher=${Uri.encodeComponent(publisherValue)}'
-        : '';
+    final query = _buildQuery({
+      'publisher': publisherValue,
+      'maxChapters': maxChaptersValue,
+    });
 
     try {
       final response = await _api.get('/media/fandomOptions$query');
@@ -218,21 +229,44 @@ class JobProvider extends ChangeNotifier {
     }
   }
 
+  JobParam? _maxChaptersParam(Job job) {
+    try {
+      return job.params.firstWhere((p) => p.key == 'maxChapters');
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Builds a `?key=value&...` query string from the non-null, non-empty
+  /// entries of [params], in insertion order.
+  String _buildQuery(Map<String, String?> params) {
+    final parts = <String>[];
+    params.forEach((key, value) {
+      if (value != null && value.isNotEmpty) {
+        parts.add('${Uri.encodeComponent(key)}=${Uri.encodeComponent(value)}');
+      }
+    });
+    return parts.isEmpty ? '' : '?${parts.join('&')}';
+  }
+
   /// Recomputes publisher counts filtered by the currently selected
-  /// fandom(s) (or unfiltered if none are selected). Leaves the option list
-  /// and the selected publisher untouched — only the counts refresh.
+  /// fandom(s) and/or max chapters (or unfiltered if neither is set).
+  /// Leaves the option list and the selected publisher untouched — only
+  /// the counts refresh.
   Future<void> _refreshPublisherCounts(Job job) async {
     final publisherParam = _publisherParam(job);
     if (publisherParam == null || publisherParam.options.isEmpty) return;
 
     final fandomValue = _fandomParam(job)?.commaSeparatedValues ?? '';
+    final maxChaptersValue = _maxChaptersParam(job)?.currentValue;
 
     publisherParam.isLoadingOptionCounts = true;
     notifyListeners();
 
-    final query = fandomValue.isNotEmpty
-        ? '?fandom=${Uri.encodeComponent(fandomValue)}'
-        : '';
+    final query = _buildQuery({
+      'fandom': fandomValue.isNotEmpty ? fandomValue : null,
+      'maxChapters': maxChaptersValue,
+    });
 
     try {
       final response = await _api.get('/media/publisherOptions$query');
