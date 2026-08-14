@@ -60,6 +60,38 @@ class SectionKicker extends StatelessWidget {
   }
 }
 
+/// A rounded pill toggle — filled accent when selected, outlined otherwise.
+/// Used for the project tracker's status/priority selectors.
+class SelectPill extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+  const SelectPill({super.key, required this.label, required this.selected, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: selected ? AppColors.accent : Colors.transparent,
+          borderRadius: BorderRadius.circular(AppRadius.pill),
+          border: Border.all(color: selected ? AppColors.accent : AppColors.divider),
+        ),
+        child: Text(
+          label,
+          style: AppTypography.heading(
+            11,
+            weight: FontWeight.w600,
+            color: selected ? AppColors.bg : AppColors.text,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 /// A small solid status dot — accent when a job has run, divider-toned
 /// otherwise, matching `job.dotColor` in the prototype.
 class StatusDot extends StatelessWidget {
