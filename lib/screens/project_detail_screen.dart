@@ -130,7 +130,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           SectionKicker('Tasks'),
-                          if (project.status == ProjectStatus.development)
+                          if (project.status == ProjectStatus.inProgress)
                             GestureDetector(
                               onTap: () => showTaskFormSheet(context, projectId: project.id),
                               child: Text('+ Add Task',

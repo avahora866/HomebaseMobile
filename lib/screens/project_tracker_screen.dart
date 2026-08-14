@@ -19,6 +19,7 @@ class ProjectTrackerScreen extends StatefulWidget {
 
 class _ProjectTrackerScreenState extends State<ProjectTrackerScreen> {
   String _query = '';
+  int? _categoryFilter; // null = "All"
 
   @override
   void initState() {
@@ -86,6 +87,7 @@ class _ProjectTrackerScreenState extends State<ProjectTrackerScreen> {
 
                   final q = _query.trim().toLowerCase();
                   final filtered = provider.projects.where((p) {
+                    if (_categoryFilter != null && p.categoryId != _categoryFilter) return false;
                     if (q.isEmpty) return true;
                     return p.name.toLowerCase().contains(q) ||
                         (p.description?.toLowerCase().contains(q) ?? false);
@@ -100,13 +102,21 @@ class _ProjectTrackerScreenState extends State<ProjectTrackerScreen> {
                     padding: const EdgeInsets.fromLTRB(18, 16, 18, 40),
                     children: [
                       _SearchBar(onChanged: (v) => setState(() => _query = v)),
+                      if (provider.categories.isNotEmpty) ...[
+                        const SizedBox(height: 10),
+                        _CategoryFilterBar(
+                          categories: provider.categories,
+                          selected: _categoryFilter,
+                          onSelect: (id) => setState(() => _categoryFilter = id),
+                        ),
+                      ],
                       const SizedBox(height: 16),
                       if (filtered.isEmpty)
                         Padding(
                           padding: const EdgeInsets.only(top: 24),
                           child: Center(
                             child: Text(
-                              provider.projects.isEmpty ? 'No projects yet.' : 'No projects match your search.',
+                              provider.projects.isEmpty ? 'No projects yet.' : 'No projects match your filters.',
                               style: AppTypography.body(14, color: AppColors.ink(0.55)),
                             ),
                           ),
@@ -124,6 +134,60 @@ class _ProjectTrackerScreenState extends State<ProjectTrackerScreen> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CategoryFilterBar extends StatelessWidget {
+  final List<ProjectCategory> categories;
+  final int? selected;
+  final ValueChanged<int?> onSelect;
+  const _CategoryFilterBar({required this.categories, required this.selected, required this.onSelect});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 28,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        children: [
+          _FilterChip(label: 'All', selected: selected == null, onTap: () => onSelect(null)),
+          for (final c in categories) ...[
+            const SizedBox(width: 8),
+            _FilterChip(label: c.name, selected: selected == c.id, onTap: () => onSelect(c.id)),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _FilterChip extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+  const _FilterChip({required this.label, required this.selected, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: selected ? AppColors.accent : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: selected ? AppColors.accent : AppColors.divider),
+        ),
+        child: Text(
+          label,
+          style: AppTypography.heading(
+            11,
+            weight: FontWeight.w600,
+            color: selected ? AppColors.bg : AppColors.text,
+          ).copyWith(letterSpacing: 0.3),
         ),
       ),
     );

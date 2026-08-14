@@ -1,23 +1,41 @@
 enum ProjectStatus {
   idea,
-  development,
+  inProgress,
   paused,
   completed,
   archived;
 
   static ProjectStatus fromJson(String value) => ProjectStatus.values.firstWhere(
-        (s) => s.name.toUpperCase() == value,
+        (s) => s.wireName == value,
         orElse: () => ProjectStatus.idea,
       );
 
-  String get toJson => name.toUpperCase();
+  String get wireName {
+    switch (this) {
+      case ProjectStatus.idea:
+        return 'IDEA';
+      case ProjectStatus.inProgress:
+        return 'IN_PROGRESS';
+      case ProjectStatus.paused:
+        return 'PAUSED';
+      case ProjectStatus.completed:
+        return 'COMPLETED';
+      case ProjectStatus.archived:
+        return 'ARCHIVED';
+    }
+  }
 
+  String get toJson => wireName;
+
+  // "In Progress" rather than the software-specific "Development" — this
+  // status just means the project is actively being worked on, whatever
+  // kind of project it is (a research paper counts as much as an app).
   String get label {
     switch (this) {
       case ProjectStatus.idea:
         return 'Idea';
-      case ProjectStatus.development:
-        return 'Development';
+      case ProjectStatus.inProgress:
+        return 'In Progress';
       case ProjectStatus.paused:
         return 'Paused';
       case ProjectStatus.completed:

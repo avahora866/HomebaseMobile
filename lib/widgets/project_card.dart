@@ -14,7 +14,7 @@ class ProjectCard extends StatelessWidget {
 
   Color get _dotColor {
     switch (project.status) {
-      case ProjectStatus.development:
+      case ProjectStatus.inProgress:
       case ProjectStatus.paused:
         return AppColors.accent;
       case ProjectStatus.idea:
@@ -33,7 +33,7 @@ class ProjectCard extends StatelessWidget {
       case ProjectStatus.archived:
         return 0.45;
       case ProjectStatus.idea:
-      case ProjectStatus.development:
+      case ProjectStatus.inProgress:
         return 1.0;
     }
   }

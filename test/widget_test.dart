@@ -71,7 +71,7 @@ void main() {
       id: 1,
       name: 'Homebase Mobile',
       description: 'Flutter client for the job runner & budget tools.',
-      status: pm.ProjectStatus.development,
+      status: pm.ProjectStatus.inProgress,
       categoryId: category.id,
       categoryName: category.name,
       taskCount: 1,
@@ -129,6 +129,7 @@ void main() {
   testWidgets('Tracker home renders project cards grouped by status and opens New Project',
       (WidgetTester tester) async {
     final personal = pm.ProjectCategory(id: 1, name: 'Personal');
+    final work = pm.ProjectCategory(id: 2, name: 'Work');
     final now = DateTime(2026, 1, 1);
     final idea = pm.Project(
       id: 1,
@@ -143,9 +144,9 @@ void main() {
     final inDev = pm.Project(
       id: 2,
       name: 'Homebase Mobile',
-      status: pm.ProjectStatus.development,
-      categoryId: personal.id,
-      categoryName: personal.name,
+      status: pm.ProjectStatus.inProgress,
+      categoryId: work.id,
+      categoryName: work.name,
       taskCount: 6,
       createdAt: now,
       updatedAt: now,
@@ -162,13 +163,23 @@ void main() {
     // The screen's own initState kicks off a real (network-less, failing)
     // load() — let that settle, then seed data directly as if it succeeded.
     await tester.pumpAndSettle();
-    provider.seedProjectsForTest(categories: [personal], projects: [idea, inDev]);
+    provider.seedProjectsForTest(categories: [personal, work], projects: [idea, inDev]);
     await tester.pumpAndSettle();
 
     expect(find.text('Recipe box app'), findsOneWidget);
     expect(find.text('Personal · no tasks'), findsOneWidget);
     expect(find.text('Homebase Mobile'), findsOneWidget);
-    expect(find.text('Personal · 6 tasks'), findsOneWidget);
+    expect(find.text('Work · 6 tasks'), findsOneWidget);
+
+    // Filtering by category hides projects in other categories.
+    await tester.tap(find.text('Work'));
+    await tester.pumpAndSettle();
+    expect(find.text('Homebase Mobile'), findsOneWidget);
+    expect(find.text('Recipe box app'), findsNothing);
+
+    await tester.tap(find.text('All'));
+    await tester.pumpAndSettle();
+    expect(find.text('Recipe box app'), findsOneWidget);
 
     await tester.tap(find.text('+'));
     await tester.pumpAndSettle();
