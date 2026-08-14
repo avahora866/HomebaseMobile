@@ -27,6 +27,10 @@ enum ProjectStatus {
 
   String get toJson => wireName;
 
+  /// Mirrors the backend's task-creation gate: allowed at IDEA and
+  /// IN_PROGRESS, blocked once a project is PAUSED, COMPLETED, or ARCHIVED.
+  bool get allowsTaskCreation => this == ProjectStatus.idea || this == ProjectStatus.inProgress;
+
   // "In Progress" rather than the software-specific "Development" — this
   // status just means the project is actively being worked on, whatever
   // kind of project it is (a research paper counts as much as an app).

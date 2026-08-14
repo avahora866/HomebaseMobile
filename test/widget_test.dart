@@ -126,6 +126,47 @@ void main() {
     expect(find.text('Edit Task'), findsOneWidget);
   });
 
+  testWidgets('Add Task shows at Idea and In Progress, hidden once Paused', (WidgetTester tester) async {
+    final category = pm.ProjectCategory(id: 1, name: 'Personal');
+    final now = DateTime(2026, 1, 1);
+    pm.Project projectWith(pm.ProjectStatus status) => pm.Project(
+          id: 1,
+          name: 'Black Death research paper',
+          status: status,
+          categoryId: category.id,
+          categoryName: category.name,
+          taskCount: 0,
+          createdAt: now,
+          updatedAt: now,
+        );
+
+    final provider = ProjectProvider()
+      ..status = ProjectTrackerStatus.success
+      ..categories = [category]
+      ..projects = [projectWith(pm.ProjectStatus.idea)];
+
+    await tester.pumpWidget(
+      ChangeNotifierProvider<ProjectProvider>.value(
+        value: provider,
+        child: MaterialApp(theme: AppTheme.theme, home: const ProjectDetailScreen(projectId: 1)),
+      ),
+    );
+    await tester.pumpAndSettle();
+    provider.seedTasksForTest(1, const []);
+    await tester.pumpAndSettle();
+    expect(find.text('+ Add Task'), findsOneWidget);
+
+    provider.projects = [projectWith(pm.ProjectStatus.inProgress)];
+    provider.seedTasksForTest(1, const []);
+    await tester.pumpAndSettle();
+    expect(find.text('+ Add Task'), findsOneWidget);
+
+    provider.projects = [projectWith(pm.ProjectStatus.paused)];
+    provider.seedTasksForTest(1, const []);
+    await tester.pumpAndSettle();
+    expect(find.text('+ Add Task'), findsNothing);
+  });
+
   testWidgets('Tracker home renders project cards grouped by status and opens New Project',
       (WidgetTester tester) async {
     final personal = pm.ProjectCategory(id: 1, name: 'Personal');
