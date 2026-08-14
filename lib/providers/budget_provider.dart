@@ -24,6 +24,13 @@ class BudgetProvider extends ChangeNotifier {
   bool subscriptionOnly = false;
   Set<String> selectedTags = {};
 
+  /// Days of the week to keep, as `DateTime.monday`…`DateTime.sunday`.
+  /// Empty means "every day".
+  Set<int> selectedWeekdays = {};
+
+  /// A single calendar day to narrow to, or null for the whole month.
+  DateTime? selectedDate;
+
   // ── Sort — defaults to date, oldest first ───────────────────────
   BudgetSortField sortField = BudgetSortField.date;
   bool sortAscending = true;
@@ -48,6 +55,8 @@ class BudgetProvider extends ChangeNotifier {
     final filtered = transactions.where((t) {
       if (subscriptionOnly && !t.subscription) return false;
       if (selectedTags.isNotEmpty && !t.tagList.any(selectedTags.contains)) return false;
+      if (selectedWeekdays.isNotEmpty && !selectedWeekdays.contains(t.date.weekday)) return false;
+      if (selectedDate != null && !_isSameDay(t.date, selectedDate!)) return false;
       if (query.isEmpty) return true;
       final note = t.note?.toLowerCase() ?? '';
       return t.description.toLowerCase().contains(query) || note.contains(query);
@@ -77,6 +86,40 @@ class BudgetProvider extends ChangeNotifier {
       selectedTags.remove(tag);
     } else {
       selectedTags.add(tag);
+    }
+    notifyListeners();
+  }
+
+  void toggleWeekday(int weekday) {
+    if (selectedWeekdays.contains(weekday)) {
+      selectedWeekdays.remove(weekday);
+    } else {
+      selectedWeekdays.add(weekday);
+    }
+    notifyListeners();
+  }
+
+  void clearWeekdays() {
+    if (selectedWeekdays.isEmpty) return;
+    selectedWeekdays = {};
+    notifyListeners();
+  }
+
+  /// Narrows to a single day. Picking a date outside [selectedMonth] moves
+  /// the month with it and refetches, so the date filter doubles as a
+  /// jump-to-date.
+  void setSelectedDate(DateTime? date) {
+    if (date == null) {
+      selectedDate = null;
+      notifyListeners();
+      return;
+    }
+
+    selectedDate = DateTime(date.year, date.month, date.day);
+    if (date.year != selectedMonth.year || date.month != selectedMonth.month) {
+      selectedMonth = DateTime(date.year, date.month);
+      load();
+      return;
     }
     notifyListeners();
   }
@@ -134,14 +177,19 @@ class BudgetProvider extends ChangeNotifier {
 
   void goToPreviousMonth() {
     selectedMonth = DateTime(selectedMonth.year, selectedMonth.month - 1);
+    selectedDate = null;
     load();
   }
 
   void goToNextMonth() {
     if (!canGoToNextMonth) return;
     selectedMonth = DateTime(selectedMonth.year, selectedMonth.month + 1);
+    selectedDate = null;
     load();
   }
+
+  bool _isSameDay(DateTime a, DateTime b) =>
+      a.year == b.year && a.month == b.month && a.day == b.day;
 
   String _isoDate(DateTime d) =>
       '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';

@@ -161,7 +161,11 @@ class _FilterBar extends StatelessWidget {
             ],
           ),
         ),
+        const SizedBox(height: 12),
+        _DayFilterRow(budget: budget),
         const SizedBox(height: 10),
+        _DateFilterRow(budget: budget),
+        const SizedBox(height: 12),
         Wrap(
           spacing: 8,
           runSpacing: 8,
@@ -184,18 +188,155 @@ class _FilterBar extends StatelessWidget {
   }
 }
 
+/// Mon–Sun chips: a day-of-week filter over the month's transactions.
+/// Selecting none means every day, matching how the tag chips behave.
+class _DayFilterRow extends StatelessWidget {
+  final BudgetProvider budget;
+  const _DayFilterRow({required this.budget});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text('Day', style: AppTypography.body(12, color: AppColors.ink(0.55))),
+            const Spacer(),
+            if (budget.selectedWeekdays.isNotEmpty)
+              GestureDetector(
+                onTap: budget.clearWeekdays,
+                child: Text(
+                  'Clear',
+                  style: AppTypography.body(12, weight: FontWeight.w600, color: AppColors.accent),
+                ),
+              ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          children: [
+            for (var weekday = DateTime.monday; weekday <= DateTime.sunday; weekday++)
+              _FilterChip(
+                label: kWeekdayNames[weekday - 1],
+                selected: budget.selectedWeekdays.contains(weekday),
+                onTap: () => budget.toggleWeekday(weekday),
+                compact: true,
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+/// A single-date filter. Tapping opens the calendar; picking a date in
+/// another month moves the whole screen to that month.
+class _DateFilterRow extends StatelessWidget {
+  final BudgetProvider budget;
+  const _DateFilterRow({required this.budget});
+
+  Future<void> _pickDate(BuildContext context) async {
+    final now = DateTime.now();
+    final month = budget.selectedMonth;
+
+    // The month selector never goes past the current month, so neither does
+    // the calendar. It opens on the selected date, else on the last day of
+    // the month being viewed (today, when that month is this one).
+    final lastDate = DateTime(now.year, now.month + 1, 0);
+    final decadeAgo = DateTime(now.year - 10);
+    final firstDate = month.isBefore(decadeAgo) ? month : decadeAgo;
+
+    var initial = budget.selectedDate ??
+        (month.year == now.year && month.month == now.month
+            ? now
+            : DateTime(month.year, month.month + 1, 0));
+    if (initial.isAfter(lastDate)) initial = lastDate;
+    if (initial.isBefore(firstDate)) initial = firstDate;
+
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: initial,
+      firstDate: firstDate,
+      lastDate: lastDate,
+    );
+    if (picked != null) budget.setSelectedDate(picked);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final date = budget.selectedDate;
+    final selected = date != null;
+    final label = date == null
+        ? 'Pick a date'
+        : '${kWeekdayNames[date.weekday - 1]} ${date.day} ${kMonthAbbr[date.month - 1]}';
+
+    return Row(
+      children: [
+        Text('Date', style: AppTypography.body(12, color: AppColors.ink(0.55))),
+        const SizedBox(width: 10),
+        GestureDetector(
+          onTap: () => _pickDate(context),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: selected ? AppColors.accent : Colors.transparent,
+              borderRadius: BorderRadius.circular(AppRadius.pill),
+              border: Border.all(color: selected ? AppColors.accent : AppColors.divider),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.calendar_today_rounded,
+                  size: 12,
+                  color: selected ? AppColors.bg : AppColors.ink(0.6),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  label,
+                  style: AppTypography.heading(
+                    11,
+                    weight: FontWeight.w600,
+                    color: selected ? AppColors.bg : AppColors.text,
+                  ).copyWith(letterSpacing: 0.3),
+                ),
+              ],
+            ),
+          ),
+        ),
+        if (selected) ...[
+          const SizedBox(width: 8),
+          GestureDetector(
+            onTap: () => budget.setSelectedDate(null),
+            child: Icon(Icons.close_rounded, size: 16, color: AppColors.ink(0.6)),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
 class _FilterChip extends StatelessWidget {
   final String label;
   final bool selected;
   final VoidCallback onTap;
-  const _FilterChip({required this.label, required this.selected, required this.onTap});
+  final bool compact;
+  const _FilterChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+    this.compact = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: EdgeInsets.symmetric(horizontal: compact ? 9 : 12, vertical: 6),
         decoration: BoxDecoration(
           color: selected ? AppColors.accent : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
