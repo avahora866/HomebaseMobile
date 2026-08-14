@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
-enum DrawerDestination { home, budget, settings }
+enum DrawerDestination { home, budget, projectTracker, settings }
 
 /// The hamburger-triggered drawer: a backdrop plus a 76%-wide panel sliding
 /// in from the left, matching the prototype's `.drawer-backdrop` /
@@ -14,6 +14,7 @@ class AppDrawerOverlay extends StatelessWidget {
   final VoidCallback onClose;
   final VoidCallback onHome;
   final VoidCallback onBudget;
+  final VoidCallback onProjectTracker;
   final VoidCallback onSettings;
 
   const AppDrawerOverlay({
@@ -23,6 +24,7 @@ class AppDrawerOverlay extends StatelessWidget {
     required this.onClose,
     required this.onHome,
     required this.onBudget,
+    required this.onProjectTracker,
     required this.onSettings,
   });
 
@@ -71,6 +73,11 @@ class AppDrawerOverlay extends StatelessWidget {
                         label: 'Budget',
                         active: active == DrawerDestination.budget,
                         onTap: onBudget,
+                      ),
+                      _DrawerItem(
+                        label: 'Project Tracker',
+                        active: active == DrawerDestination.projectTracker,
+                        onTap: onProjectTracker,
                       ),
                       _DrawerItem(
                         label: 'Settings',
