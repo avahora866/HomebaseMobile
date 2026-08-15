@@ -4,6 +4,7 @@ import '../models/net_worth.dart';
 import '../providers/net_worth_provider.dart';
 import '../theme/app_theme.dart';
 import 'atoms.dart';
+import 'confirm_dialog.dart';
 
 /// Add / edit / delete for one net worth account. Pass [account] to edit an
 /// existing row, omit it to create a new one.
@@ -105,32 +106,12 @@ class _NetWorthAccountSheetState extends State<_NetWorthAccountSheet> {
     final account = widget.account;
     if (account == null) return;
 
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        backgroundColor: AppColors.bg,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.card)),
-        title: Text('Delete ${account.name}?', style: AppTypography.heading(16)),
-        content: Text(
-          'It will be removed from your net worth. This cannot be undone.',
-          style: AppTypography.body(13, color: AppColors.ink(0.7)),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: Text('Cancel', style: AppTypography.body(13, color: AppColors.ink(0.7))),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: Text(
-              'Delete',
-              style: AppTypography.body(13, weight: FontWeight.w700, color: AppColors.accent),
-            ),
-          ),
-        ],
-      ),
+    final confirmed = await showConfirmDialog(
+      context,
+      title: 'Delete ${account.name}?',
+      message: 'It will be removed from your net worth. This cannot be undone.',
     );
-    if (confirmed != true || !mounted) return;
+    if (!confirmed || !mounted) return;
 
     setState(() {
       _busy = true;
@@ -198,17 +179,20 @@ class _NetWorthAccountSheetState extends State<_NetWorthAccountSheet> {
 
               const SectionKicker('Category'),
               const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  for (final category in NetWorthCategory.values)
-                    _CategoryChip(
-                      label: category.label,
-                      selected: _category == category,
-                      onTap: _busy ? null : () => setState(() => _category = category),
-                    ),
-                ],
+              IgnorePointer(
+                ignoring: _busy,
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (final category in NetWorthCategory.values)
+                      SelectPill(
+                        label: category.label,
+                        selected: _category == category,
+                        onTap: () => setState(() => _category = category),
+                      ),
+                  ],
+                ),
               ),
               const SizedBox(height: 18),
 
@@ -293,36 +277,6 @@ class _Field extends StatelessWidget {
         border: Border.all(color: AppColors.divider),
       ),
       child: child,
-    );
-  }
-}
-
-class _CategoryChip extends StatelessWidget {
-  final String label;
-  final bool selected;
-  final VoidCallback? onTap;
-  const _CategoryChip({required this.label, required this.selected, this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: selected ? AppColors.accent : Colors.transparent,
-          borderRadius: BorderRadius.circular(AppRadius.pill),
-          border: Border.all(color: selected ? AppColors.accent : AppColors.divider),
-        ),
-        child: Text(
-          label,
-          style: AppTypography.heading(
-            11,
-            weight: FontWeight.w600,
-            color: selected ? AppColors.bg : AppColors.text,
-          ).copyWith(letterSpacing: 0.3),
-        ),
-      ),
     );
   }
 }

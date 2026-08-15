@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'providers/budget_provider.dart';
 import 'providers/job_provider.dart';
 import 'providers/net_worth_provider.dart';
+import 'providers/project_provider.dart';
 import 'screens/home_screen.dart';
 import 'theme/app_theme.dart';
 
@@ -23,6 +24,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => JobProvider()),
         ChangeNotifierProvider(create: (_) => BudgetProvider()),
         ChangeNotifierProvider(create: (_) => NetWorthProvider()),
+        ChangeNotifierProvider(create: (_) => ProjectProvider()),
       ],
       child: MaterialApp(
         title: 'Homebase',

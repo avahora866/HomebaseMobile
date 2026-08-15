@@ -5,9 +5,11 @@ import '../providers/job_provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/job_card.dart';
+import '../widgets/slide_route.dart';
 import 'budget_screen.dart';
 import 'job_detail_screen.dart';
 import 'net_worth_screen.dart';
+import 'project_tracker_screen.dart';
 import 'settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -23,22 +25,27 @@ class _HomeScreenState extends State<HomeScreen> {
   JobCategory? _selectedCategory; // null = "All"
 
   void _openDetail(String jobId) {
-    Navigator.of(context).push(_slideRoute(JobDetailScreen(jobId: jobId)));
+    Navigator.of(context).push(slideRoute(JobDetailScreen(jobId: jobId)));
   }
 
   void _openBudget() {
     setState(() => _drawerOpen = false);
-    Navigator.of(context).push(_slideRoute(const BudgetScreen()));
+    Navigator.of(context).push(slideRoute(const BudgetScreen()));
+  }
+
+  void _openProjectTracker() {
+    setState(() => _drawerOpen = false);
+    Navigator.of(context).push(slideRoute(const ProjectTrackerScreen()));
   }
 
   void _openNetWorth() {
     setState(() => _drawerOpen = false);
-    Navigator.of(context).push(_slideRoute(const NetWorthScreen()));
+    Navigator.of(context).push(slideRoute(const NetWorthScreen()));
   }
 
   void _openSettings() {
     setState(() => _drawerOpen = false);
-    Navigator.of(context).push(_slideRoute(const SettingsScreen()));
+    Navigator.of(context).push(slideRoute(const SettingsScreen()));
   }
 
   /// Flattens the filtered job list into a sequence of section headers
@@ -135,6 +142,7 @@ class _HomeScreenState extends State<HomeScreen> {
               onHome: () => setState(() => _drawerOpen = false),
               onBudget: _openBudget,
               onNetWorth: _openNetWorth,
+              onProjectTracker: _openProjectTracker,
               onSettings: _openSettings,
             ),
           ],
@@ -266,21 +274,4 @@ class _Chip extends StatelessWidget {
       ),
     );
   }
-}
-
-// ── Page transition ───────────────────────────────────────────────────
-
-PageRoute _slideRoute(Widget page) {
-  return PageRouteBuilder(
-    pageBuilder: (_, _, _) => page,
-    transitionDuration: const Duration(milliseconds: 300),
-    reverseTransitionDuration: const Duration(milliseconds: 250),
-    transitionsBuilder: (_, animation, _, child) {
-      return SlideTransition(
-        position: Tween(begin: const Offset(1.0, 0.0), end: Offset.zero)
-            .animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic)),
-        child: child,
-      );
-    },
-  );
 }
