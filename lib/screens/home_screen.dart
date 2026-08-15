@@ -8,6 +8,7 @@ import '../widgets/job_card.dart';
 import '../widgets/slide_route.dart';
 import 'budget_screen.dart';
 import 'job_detail_screen.dart';
+import 'net_worth_screen.dart';
 import 'project_tracker_screen.dart';
 import 'settings_screen.dart';
 
@@ -35,6 +36,11 @@ class _HomeScreenState extends State<HomeScreen> {
   void _openProjectTracker() {
     setState(() => _drawerOpen = false);
     Navigator.of(context).push(slideRoute(const ProjectTrackerScreen()));
+  }
+
+  void _openNetWorth() {
+    setState(() => _drawerOpen = false);
+    Navigator.of(context).push(slideRoute(const NetWorthScreen()));
   }
 
   void _openSettings() {
@@ -135,6 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
               onClose: () => setState(() => _drawerOpen = false),
               onHome: () => setState(() => _drawerOpen = false),
               onBudget: _openBudget,
+              onNetWorth: _openNetWorth,
               onProjectTracker: _openProjectTracker,
               onSettings: _openSettings,
             ),
