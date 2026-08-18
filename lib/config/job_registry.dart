@@ -70,10 +70,21 @@ final List<Job> jobRegistry = [
     id: 'interesting_fact',
     name: 'Interesting Fact',
     description:
-        'Get an interesting fact from one of the various fields I am interested in.',
+        'Get an interesting fact from one of the various fields I am interested in. '
+        'Optionally filter to a specific field.',
     endpoint: '/facts/interestingFact',
     method: 'GET',
     category: JobCategory.interestingFact,
+    params: [
+      JobParam(
+        key: 'field',
+        label: 'Field',
+        inputType: ParamInputType.dropdown,
+        required: false,
+        // Populated automatically when the job screen opens
+        options: [],
+      ),
+    ],
   ),
 
   Job(

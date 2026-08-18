@@ -70,6 +70,9 @@ class JobProvider extends ChangeNotifier {
     if (jobId == 'random_media') {
       await _fetchMediaCounts(job);
     }
+    if (jobId == 'interesting_fact') {
+      await _fetchFactFields(job);
+    }
   }
 
   /// Toggle a value in a multiSelectDropdown param.
@@ -366,6 +369,41 @@ class JobProvider extends ChangeNotifier {
     } finally {
       categoryParam.isLoadingOptions = false;
       notifyListeners();
+    }
+  }
+
+  // ── Interesting fact field options fetch ─────────────────────────────
+
+  Future<void> _fetchFactFields(Job job) async {
+    final fieldParam = _factFieldParam(job);
+    if (fieldParam == null) return;
+    // Guard: skip if options are already loaded
+    if (fieldParam.options.isNotEmpty) return;
+
+    fieldParam.isLoadingOptions = true;
+    notifyListeners();
+
+    try {
+      final response = await _api.get('/facts/fields');
+      if (response['success'] == true && response['data'] is List) {
+        fieldParam.options =
+            (response['data'] as List).map((e) => e.toString()).toList();
+      } else {
+        fieldParam.options = [];
+      }
+    } catch (_) {
+      fieldParam.options = [];
+    } finally {
+      fieldParam.isLoadingOptions = false;
+      notifyListeners();
+    }
+  }
+
+  JobParam? _factFieldParam(Job job) {
+    try {
+      return job.params.firstWhere((p) => p.key == 'field');
+    } catch (_) {
+      return null;
     }
   }
 
