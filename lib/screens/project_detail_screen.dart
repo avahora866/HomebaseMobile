@@ -74,7 +74,10 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
             final byStatus = <TaskStatus, List<Task>>{
               for (final s in TaskStatus.values) s: tasks.where((t) => t.status == s).toList(),
             };
-            final visibleTasks = byStatus[_tab] ?? [];
+            // TaskPriority is declared high, medium, low, so its index
+            // doubles as the sort rank; tasks with no priority sort last.
+            final visibleTasks = List<Task>.of(byStatus[_tab] ?? [])
+              ..sort((a, b) => (a.priority?.index ?? 3).compareTo(b.priority?.index ?? 3));
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
