@@ -183,7 +183,7 @@ class ProjectProvider extends ChangeNotifier {
     if (response['success'] == true) {
       final task = Task.fromJson(response['data'] as Map<String, dynamic>);
       _tasksByProject[projectId] = [...tasksFor(projectId), task];
-      _bumpTaskCount(projectId, 1);
+      if (_isActiveStatus(task.status)) _bumpTaskCount(projectId, 1);
       notifyListeners();
       return null;
     }
@@ -210,6 +210,8 @@ class ProjectProvider extends ChangeNotifier {
       _tasksByProject[task.projectId] = [
         for (final t in tasksFor(task.projectId)) if (t.id == task.id) updated else t
       ];
+      final delta = (_isActiveStatus(updated.status) ? 1 : 0) - (_isActiveStatus(task.status) ? 1 : 0);
+      _bumpTaskCount(task.projectId, delta);
       notifyListeners();
       return null;
     }
@@ -221,12 +223,14 @@ class ProjectProvider extends ChangeNotifier {
     if (response['success'] == true) {
       _tasksByProject[task.projectId] =
           tasksFor(task.projectId).where((t) => t.id != task.id).toList();
-      _bumpTaskCount(task.projectId, -1);
+      if (_isActiveStatus(task.status)) _bumpTaskCount(task.projectId, -1);
       notifyListeners();
       return null;
     }
     return response['error'].toString();
   }
+
+  bool _isActiveStatus(TaskStatus status) => status != TaskStatus.done;
 
   void _bumpTaskCount(int projectId, int delta) {
     final index = projects.indexWhere((p) => p.id == projectId);
