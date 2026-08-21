@@ -20,7 +20,6 @@ class ProjectDetailScreen extends StatefulWidget {
 
 class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
   TaskStatus _tab = TaskStatus.todo;
-  bool _sortByPriority = false;
 
   @override
   void initState() {
@@ -75,12 +74,10 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
             final byStatus = <TaskStatus, List<Task>>{
               for (final s in TaskStatus.values) s: tasks.where((t) => t.status == s).toList(),
             };
-            final visibleTasks = List<Task>.of(byStatus[_tab] ?? []);
-            if (_sortByPriority) {
-              // TaskPriority is declared high, medium, low, so its index
-              // doubles as the sort rank; tasks with no priority sort last.
-              visibleTasks.sort((a, b) => (a.priority?.index ?? 3).compareTo(b.priority?.index ?? 3));
-            }
+            // TaskPriority is declared high, medium, low, so its index
+            // doubles as the sort rank; tasks with no priority sort last.
+            final visibleTasks = List<Task>.of(byStatus[_tab] ?? [])
+              ..sort((a, b) => (a.priority?.index ?? 3).compareTo(b.priority?.index ?? 3));
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -136,23 +133,12 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           SectionKicker('Tasks'),
-                          Row(
-                            children: [
-                              _PrioritySortToggle(
-                                active: _sortByPriority,
-                                onTap: () => setState(() => _sortByPriority = !_sortByPriority),
-                              ),
-                              if (project.status.allowsTaskCreation) ...[
-                                const SizedBox(width: 14),
-                                GestureDetector(
-                                  onTap: () => showTaskFormSheet(context, projectId: project.id),
-                                  child: Text('+ Add Task',
-                                      style: AppTypography.heading(12,
-                                          weight: FontWeight.w700, color: AppColors.accent)),
-                                ),
-                              ],
-                            ],
-                          ),
+                          if (project.status.allowsTaskCreation)
+                            GestureDetector(
+                              onTap: () => showTaskFormSheet(context, projectId: project.id),
+                              child: Text('+ Add Task',
+                                  style: AppTypography.heading(12, weight: FontWeight.w700, color: AppColors.accent)),
+                            ),
                         ],
                       ),
                       const SizedBox(height: 10),
@@ -185,28 +171,6 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
             );
           },
         ),
-      ),
-    );
-  }
-}
-
-class _PrioritySortToggle extends StatelessWidget {
-  final bool active;
-  final VoidCallback onTap;
-  const _PrioritySortToggle({required this.active, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    final color = active ? AppColors.accent : AppColors.ink(0.55);
-    return GestureDetector(
-      onTap: onTap,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.swap_vert_rounded, size: 15, color: color),
-          const SizedBox(width: 2),
-          Text('Priority', style: AppTypography.heading(11, weight: FontWeight.w700, color: color)),
-        ],
       ),
     );
   }
