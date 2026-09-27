@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Homebase glyph from homebase-icon.svg (200x200), centred in a 300x300
+     viewport so it sits inside the adaptive icon safe zone. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="300"
+    android:viewportHeight="300">
+    <group
+        android:translateX="50"
+        android:translateY="50">
+        <path
+            android:fillColor="#F3F2F2"
+            android:pathData="M70,58h60v18h-60z" />
+        <path
+            android:fillColor="#F3F2F2"
+            android:pathData="M55,86h90v18h-90z" />
+        <path
+            android:fillColor="#178A4F"
+            android:pathData="M40,114h120v28h-120z" />
+    </group>
+</vector>
