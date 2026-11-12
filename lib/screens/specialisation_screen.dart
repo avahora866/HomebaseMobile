@@ -242,7 +242,8 @@ class _TopicRow extends StatelessWidget {
   });
 
   String get _meta => [
-        if (topic.prerequisiteIds.isNotEmpty) '${topic.prerequisiteIds.length} prereq',
+        if (topic.prerequisiteIds.isNotEmpty)
+          '${topic.prerequisiteIds.length} ${topic.prerequisiteIds.length == 1 ? 'prereq' : 'prereqs'}',
         if (topic.logs.isNotEmpty) '${topic.logs.length} ${topic.logs.length == 1 ? 'log' : 'logs'}',
         if (topic.projectLinks.isNotEmpty)
           '${topic.projectLinks.length} ${topic.projectLinks.length == 1 ? 'project' : 'projects'}',

@@ -160,6 +160,7 @@ class _TopicDetailScreenState extends State<TopicDetailScreen> {
     final caps = detail.capabilities;
     final kids = detail.childrenOf(topic.id);
     final prerequisites = [for (final id in topic.prerequisiteIds) ?detail.topic(id)];
+    final canAddPrerequisite = detail.topics.any((t) => t.id != topic.id && !topic.prerequisiteIds.contains(t.id));
     return ListView(
       padding: const EdgeInsets.fromLTRB(18, 14, 18, 40),
       children: [
@@ -188,7 +189,7 @@ class _TopicDetailScreenState extends State<TopicDetailScreen> {
           const SizedBox(height: 22),
           LearningSectionHeader(
             'Prerequisites',
-            actionLabel: detail.topics.length > 1 ? '+ Add' : null,
+            actionLabel: canAddPrerequisite ? '+ Add' : null,
             onAction: () => _addPrerequisite(detail, topic),
           ),
           Text('Informational only — prerequisites never lock a topic.',
