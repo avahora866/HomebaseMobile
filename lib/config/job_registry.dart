@@ -66,6 +66,34 @@ final List<Job> jobRegistry = [
     ],
   ),
 
+  // ------------------------------------------------------------------
+  // /media/search
+  // ------------------------------------------------------------------
+  Job(
+    id: 'media_search',
+    name: 'Media Search',
+    description: 'Search your media lists by title. '
+        'Matches any status — to-read, in progress or finished.',
+    endpoint: '/media/search',
+    method: 'GET',
+    category: JobCategory.media,
+    params: [
+      JobParam(
+        key: 'media',
+        label: 'Type',
+        inputType: ParamInputType.dropdown,
+        required: true,
+        options: _mediaTypes,
+      ),
+      JobParam(
+        key: 'title',
+        label: 'Title',
+        inputType: ParamInputType.text,
+        required: true,
+      ),
+    ],
+  ),
+
   Job(
     id: 'interesting_fact',
     name: 'Interesting Fact',

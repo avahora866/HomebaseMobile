@@ -9,6 +9,7 @@ import '../widgets/atoms.dart';
 import '../widgets/param_form.dart';
 import '../widgets/interesting_fact_card.dart';
 import '../widgets/media_result_card.dart';
+import '../widgets/media_search_results.dart';
 import '../widgets/trunk_result_card.dart';
 import '../widgets/result_states.dart';
 
@@ -112,6 +113,12 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       if (result['media'] == null) return const EmptyResultCard();
       final mediaType = job.paramValues?['media'];
       return MediaResultCard(result: result, category: mediaType ?? job.category.label);
+    }
+
+    if (job.id == 'media_search' && job.result is List) {
+      final results = (job.result as List).whereType<Map<String, dynamic>>().toList();
+      if (results.isEmpty) return const EmptyResultCard();
+      return MediaSearchResults(results: results, mediaType: job.paramValues?['media']);
     }
 
     if (job.id == 'interesting_fact') {

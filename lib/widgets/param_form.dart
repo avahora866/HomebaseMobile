@@ -298,18 +298,42 @@ class _LoadingField extends StatelessWidget {
 
 // ── Text input ────────────────────────────────────────────────────────
 
-class _TextInputField extends StatelessWidget {
+class _TextInputField extends StatefulWidget {
   final JobParam param;
   final ValueChanged<String?> onChanged;
   const _TextInputField({required this.param, required this.onChanged});
 
   @override
+  State<_TextInputField> createState() => _TextInputFieldState();
+}
+
+class _TextInputFieldState extends State<_TextInputField> {
+  late final TextEditingController _controller =
+      TextEditingController(text: widget.param.currentValue);
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(covariant _TextInputField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Keep the box in step with the provider — e.g. Reset clears the value,
+    // which an initialValue-only field would never reflect.
+    final value = widget.param.currentValue ?? '';
+    if (_controller.text != value) _controller.text = value;
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final param = widget.param;
     return _FieldWrapper(
       label: param.label,
       isRequired: param.required,
       child: TextFormField(
-        initialValue: param.currentValue,
+        controller: _controller,
         style: AppTypography.body(14),
         cursorColor: AppColors.accent,
         decoration: InputDecoration(
@@ -326,7 +350,7 @@ class _TextInputField extends StatelessWidget {
               borderSide: const BorderSide(color: AppColors.accent, width: 1.5)),
           contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
         ),
-        onChanged: onChanged,
+        onChanged: widget.onChanged,
       ),
     );
   }
