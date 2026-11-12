@@ -16,6 +16,12 @@ const _typesWithoutCoverArt = {'fanfiction', 'podcast', 'webnovel'};
 /// backend doesn't store one (unlike fanfiction's `url`).
 const _tmdbTypes = {'movie', 'animatedmovie', 'tvshow', 'anime'};
 
+/// TMDB search link for [name] when [mediaType] is TMDB-backed, else null.
+String? tmdbSearchUrl(String? mediaType, String name) =>
+    _tmdbTypes.contains(mediaType?.toLowerCase())
+        ? Uri.https('www.themoviedb.org', '/search', {'query': name}).toString()
+        : null;
+
 /// Displayed when /media/randomPicker returns successfully. [result] is a
 /// MediaPickResult: {media: {name, summary, notionUrl, url?, chapterCount?,
 /// chapters?}, count: n} where count is how many items still match the
@@ -39,9 +45,7 @@ class MediaResultCard extends StatelessWidget {
     final chapterCount = (media['chapterCount'] as num?)?.toInt();
     final chapters = media['chapters'] is List ? media['chapters'] as List : const [];
     final hasCoverArt = !_typesWithoutCoverArt.contains(category?.toLowerCase());
-    final tmdbUrl = _tmdbTypes.contains(category?.toLowerCase()) && name != '—'
-        ? Uri.https('www.themoviedb.org', '/search', {'query': name}).toString()
-        : null;
+    final tmdbUrl = name != '—' ? tmdbSearchUrl(category, name) : null;
 
     return Container(
       width: double.infinity,
@@ -99,14 +103,14 @@ class MediaResultCard extends StatelessWidget {
                 const SizedBox(height: 10),
                 const ThickDivider(),
                 const SizedBox(height: 10),
-                if (notionUrl.isNotEmpty) _LinkRow(label: 'Notion', url: notionUrl),
+                if (notionUrl.isNotEmpty) MediaLinkRow(label: 'Notion', url: notionUrl),
                 if (url != null && url.isNotEmpty) ...[
                   const SizedBox(height: 8),
-                  _LinkRow(label: 'Link', url: url),
+                  MediaLinkRow(label: 'Link', url: url),
                 ],
                 if (tmdbUrl != null) ...[
                   const SizedBox(height: 8),
-                  _LinkRow(label: 'TMDB', url: tmdbUrl),
+                  MediaLinkRow(label: 'TMDB', url: tmdbUrl),
                 ],
                 if (chapters.isNotEmpty) ...[
                   const SizedBox(height: 12),
@@ -154,10 +158,10 @@ class _ViewChaptersButton extends StatelessWidget {
   }
 }
 
-class _LinkRow extends StatelessWidget {
+class MediaLinkRow extends StatelessWidget {
   final String label;
   final String url;
-  const _LinkRow({required this.label, required this.url});
+  const MediaLinkRow({super.key, required this.label, required this.url});
 
   Future<void> _open(BuildContext context) async {
     final uri = Uri.tryParse(url);
