@@ -34,6 +34,7 @@ void main() {
     expect(find.text('Homebase'), findsNWidgets(2));
     // "Interesting Fact" appears twice: the category filter chip and the job name.
     expect(find.text('Random Media'), findsOneWidget);
+    expect(find.text('Media Search'), findsOneWidget);
     expect(find.text('Interesting Fact'), findsAtLeastNWidgets(1));
     expect(find.text('Random Trunk'), findsOneWidget);
   });
