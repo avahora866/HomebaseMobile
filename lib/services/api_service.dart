@@ -69,7 +69,11 @@ class ApiService {
     // Safely decode — body may be empty (e.g. 204 No Content) or
     // non-JSON (e.g. plain text error from Spring).
     dynamic decoded;
-    final body = response.body.trim();
+    // Always UTF-8 (what the server sends): `response.body` falls back to
+    // Latin-1 when the content type has no charset — as Spring's
+    // `application/problem+json` errors don't — which garbles accents and
+    // dashes in error messages.
+    final body = utf8.decode(response.bodyBytes, allowMalformed: true).trim();
 
     if (body.isEmpty) {
       decoded = null;

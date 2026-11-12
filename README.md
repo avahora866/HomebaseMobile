@@ -50,10 +50,12 @@ lib/
 │   ├── budget.dart                  # Monthly summary + transaction models
 │   ├── job.dart                     # Job data model
 │   ├── job_param.dart               # Job parameter model
+│   ├── learning.dart                # Learning Path fields/specialisations/topics + rating helpers
 │   └── net_worth.dart               # Net worth account/category/summary models
 ├── providers/
 │   ├── budget_provider.dart         # Budget month/filter/sort state (read-only)
 │   ├── job_provider.dart            # Job running logic, param option fetching
+│   ├── learning_provider.dart       # Learning Path fields + cached specialisations, all writes
 │   └── net_worth_provider.dart      # Net worth accounts + add/edit/delete
 ├── services/
 │   └── api_service.dart             # HTTP client wrapper
@@ -66,6 +68,9 @@ lib/
 │   ├── job_detail_screen.dart       # Run a job, view results
 │   ├── budget_screen.dart           # Finance → Budget (read-only)
 │   ├── net_worth_screen.dart        # Finance → Net Worth (add/edit/delete)
+│   ├── learning_path_screen.dart    # Learning Path → fields overview
+│   ├── specialisation_screen.dart   # Learning Path → one specialisation's topic tree
+│   ├── topic_detail_screen.dart     # Learning Path → one topic (rate, subtopics, prereqs, logs, links)
 │   └── settings_screen.dart         # About / server info
 └── widgets/                         # Job card, param form, result cards, etc.
 ```
@@ -73,6 +78,14 @@ lib/
 The drawer groups the two finance screens under a **Finance** parent: **Budget** (read-only
 month summary + transactions) and **Net Worth** (the hand-maintained balances behind
 `finance/networth`, fully editable from the phone).
+
+**Learning Path** mirrors HomebaseWeb's section on the same `/learning/**` endpoints: fields →
+specialisations → nested topics with 1–5 confidence ratings. Only leaf topics are rated by hand
+(tap a dot; tap it again to clear); anything with subtopics shows the server's derived average,
+read-only. Prerequisites, logs, suggested order, project links and subtopic nesting appear only
+where the field's capabilities allow them, and the server enforces the same rules. On a topic,
+tapping a subtopic or any ancestor in the breadcrumb switches topics in place, so Back always
+returns to the tree.
 
 ## ✏️ The two files you'll usually touch
 

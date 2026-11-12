@@ -3,6 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'providers/budget_provider.dart';
 import 'providers/job_provider.dart';
+import 'providers/learning_provider.dart';
 import 'providers/net_worth_provider.dart';
 import 'providers/project_provider.dart';
 import 'screens/home_screen.dart';
@@ -25,6 +26,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => BudgetProvider()),
         ChangeNotifierProvider(create: (_) => NetWorthProvider()),
         ChangeNotifierProvider(create: (_) => ProjectProvider()),
+        ChangeNotifierProvider(create: (_) => LearningProvider()),
       ],
       child: MaterialApp(
         title: 'Homebase',

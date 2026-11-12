@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
-enum DrawerDestination { home, budget, netWorth, projectTracker, settings }
+enum DrawerDestination { home, budget, netWorth, projectTracker, learningPath, settings }
 
 /// The two destinations that sit under the Finance parent — the group starts
 /// expanded whenever one of them is the active screen.
@@ -20,6 +20,7 @@ class AppDrawerOverlay extends StatefulWidget {
   final VoidCallback onBudget;
   final VoidCallback onNetWorth;
   final VoidCallback onProjectTracker;
+  final VoidCallback onLearningPath;
   final VoidCallback onSettings;
 
   const AppDrawerOverlay({
@@ -31,6 +32,7 @@ class AppDrawerOverlay extends StatefulWidget {
     required this.onBudget,
     required this.onNetWorth,
     required this.onProjectTracker,
+    required this.onLearningPath,
     required this.onSettings,
   });
 
@@ -114,6 +116,11 @@ class _AppDrawerOverlayState extends State<AppDrawerOverlay> {
                         label: 'Project Tracker',
                         active: widget.active == DrawerDestination.projectTracker,
                         onTap: widget.onProjectTracker,
+                      ),
+                      _DrawerItem(
+                        label: 'Learning Path',
+                        active: widget.active == DrawerDestination.learningPath,
+                        onTap: widget.onLearningPath,
                       ),
                       _DrawerItem(
                         label: 'Settings',
